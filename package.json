@@ -1,6 +1,6 @@
 {
   "name": "@ulb-darmstadt/photogrammetry-viewer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "main": "dist/photogrammetry-viewer.js",
   "module": "dist/photogrammetry-viewer.js",
@@ -43,6 +43,7 @@
     "openseadragon": "^4.1.0"
   },
   "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.3",
     "@types/events": "^3.0.0",
     "@types/node": "^20.4.7",
     "@types/openseadragon": "^3.0.6",
