@@ -257,7 +257,7 @@ export class ViewerElement2D extends LitElement {
   }
 
   private _handleSingleClickEvent(event: PointerEvent) {
-    if (this._viewer == null || !this.measurementTool.isActive) {
+    if (this._viewer == null || !this.measurementTool.isEditModeActive) {
       return;
     }
     const rect = this.parentElement.getBoundingClientRect();
