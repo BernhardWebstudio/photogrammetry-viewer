@@ -78,11 +78,29 @@ export class ViewerElement2D extends LitElement {
       defaultZoomLevel: 0, //0 <- fit to view
       placeholderFillStyle: "#FF8800",
       preserveViewport: true,
-      //ajaxWithCredentials: false,
+      //ajaxWithCredentials: false, ?
       loadTilesWithAjax: true,
       imageLoaderLimit: 1,
       zoomPerScroll: 1.4,
-      gestureSettingsMouse: //to do: set  gestureSettingsTouch gestureSettingsPen gestureSettingsUnknown 
+      gestureSettingsMouse: 
+      {
+        scrollToZoom: true,
+        clickToZoom: false,
+        dblClickToZoom: false,
+        pinchToZoom: false,
+        // @ts-ignore
+        zoomToRefPoint: false,
+      },
+      gestureSettingsPen: 
+      {
+        scrollToZoom: true,
+        clickToZoom: false,
+        dblClickToZoom: false,
+        pinchToZoom: false,
+        // @ts-ignore
+        zoomToRefPoint: false,
+      },
+      gestureSettingsUnknown:  
       {
         scrollToZoom: true,
         clickToZoom: false,
@@ -117,7 +135,6 @@ export class ViewerElement2D extends LitElement {
   }
 
   resize(height: number, width: number, transformString: string): void {
-
     this.style.height = height + 'px';
     this.style.width = width + 'px';
     this.style.transform = transformString;
@@ -206,7 +223,7 @@ export class ViewerElement2D extends LitElement {
 
 
   private _handlePointerMove(event: PointerEvent) {
-    // TO DO: Test the behaviour with touch
+
     if (this._viewer == null || this._viewer.isMouseNavEnabled() || event.pointerId != this._lastDoublePressPointer.id || !this._isDown) {
       return;
     }
@@ -222,7 +239,6 @@ export class ViewerElement2D extends LitElement {
     this._lastDoublePressPointer.clientY = event.clientY;
 
     //don't need to check if mouse is down, because if mouse is up, 3d viewer is "active" and no more pointer events are fired
-    console.log("_handlePointerMove", event)
     this.dispatchEvent(new CustomEvent('pointer-move-in-disable-mode', {
       detail: {
         dx: dx,
@@ -293,6 +309,7 @@ export class ViewerElement2D extends LitElement {
   }
 
   private _checkIfZoomIsInvalid: () => void = debounce(() => {
+
     if (this._viewer == null) {
       return;
     }
@@ -329,6 +346,7 @@ export class ViewerElement2D extends LitElement {
 
 
   private _handleTileLoaded(event: TileEvent) {
+
     this._checkIfZoomIsInvalid();
     this._checkIfMinZoomChanged();
     this._checkIfCenterPosIsUpdated();
@@ -372,6 +390,7 @@ export class ViewerElement2D extends LitElement {
   }, 15);
 
   private _handleZoomChanged(event: ZoomEvent) {
+
     if (this._viewer == null || event.immediately == true) {
       console.log("Return zoom", event.zoom)
       return;
@@ -387,8 +406,6 @@ export class ViewerElement2D extends LitElement {
         zoomLevel: event.zoom
       }
     }));
-
-    console.log("image zoom", event.zoom)
 
   }
 
