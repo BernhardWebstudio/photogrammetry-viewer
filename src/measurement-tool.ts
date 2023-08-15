@@ -130,7 +130,6 @@ export class MeasurementTool extends EventEmitter {
 
         this.emit('calculate-hotspot-requested', camOrigin, direction);
 
-      //  this.viewer3DElement.intersectObject(camOrigin, direction);
     }
 
     addPointFrom3DScene(position: Vector3D, normal: Vector3D, updateHotspotInImage: boolean = true): void {

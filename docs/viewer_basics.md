@@ -24,6 +24,13 @@ In "One View Mode, there is the same dependency between 3D and 2D viewers as in 
 ## 2. Viewer-Layout
 The orientation of the 3D and 2D viewers depends on the set viewer size. Each viewer takes up half of the available area. If the format of the 2D viewer does not correspond to the image format, a black border area appears. Whether the two viewers are displayed one below the other or side by side depends on the arrangement in which the black border area is smallest.
 
+## 2. 3D-Viewer Axes
+<img src="imgs/negZUp.png" align="left" alt="One View Mode" style="max-width: 300px; margin-right: 20px;">
+<img src="imgs/yUp.png" align="left" alt="One View Mode" style="max-width: 300px; margin-right: 20px;">
+In the menu there is the option to show or hide the coordinate axes. The labels on the axes are designed interactively and can be clicked on. By clicking, the camera view in the 3D viewer is adjusted so that the corresponding axis runs directly towards the screen. If you click on the label "y", the y-axis of the viewer is then aligned and points directly forwards, as can be seen in the illustration on the left. When you click on the label "z", the z-axis is rotated to the front, as shown in the right-hand illustration.
+<br clear="left"/>
+
+
 ## 3. Menu
 The menu on the Viewer page contains the following tools and settings:
 

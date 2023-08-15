@@ -400,12 +400,6 @@ export class PhotogrammetryViewer extends LitElement {
         background-color: lightgray
     }
     
-    #controlpanel2
-    {
-      position: absolute;
-      z-index: 5;
-    }
-
     #viewer2D {
       position: absolute;
       z-index: 2;
@@ -424,10 +418,6 @@ export class PhotogrammetryViewer extends LitElement {
       height: 100%;
       z-index: 5;
       pointer-events: none;
-    }
-
-    #sidebar{
-      height: 400px;
     }
 
     .hotspot{
@@ -452,7 +442,6 @@ export class PhotogrammetryViewer extends LitElement {
         box-shadow: none;
         pointer-events: none;
     }
-
 
     .hotspot:focus {
         border: 3px solid rgb(0, 128, 200);

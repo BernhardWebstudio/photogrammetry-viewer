@@ -42,7 +42,7 @@ export class SingleClickEventHandler extends EventEmitter {
   private _delay: number;
   private _numClick = 0;
 
-  constructor(parentElement: HTMLElement, pointerDownFunction: string = 'mousedown', pointerUpFunction: string = 'click', delay: number = 100) {
+  constructor(parentElement: HTMLElement, pointerDownFunction: string = 'mousedown', pointerUpFunction: string = 'click', delay: number = 200) {
     super();
     parentElement.addEventListener(pointerDownFunction, this._handleMouseDown.bind(this));
     parentElement.addEventListener(pointerUpFunction, this._handleMouseClick.bind(this));
@@ -57,6 +57,7 @@ export class SingleClickEventHandler extends EventEmitter {
 
     this._holdTimeoutId = window.setTimeout(() => {
       this._isHoldEvent = true;
+      this.emit('pointerevent-is-hold-event');
     }, this._delay);
   }
 
