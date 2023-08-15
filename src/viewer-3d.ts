@@ -166,7 +166,6 @@ export class ViewerElement3D extends ModelViewerElement {
     }
 
     zoomTo(zoomLevel: number): void {
-
         if (this._referenceFieldOfViewInRad == -1) {
             console.log("Return 3d  zoom, ", this._currentZoomLevel)
             return;
@@ -178,6 +177,7 @@ export class ViewerElement3D extends ModelViewerElement {
     }
 
     setViewerOffset(deltaX: number, deltaY: number) {
+
         if (this._deltaX != deltaX || this._deltaY != deltaY) {
             this._deltaX = deltaX;
             this._deltaY = deltaY;
@@ -192,6 +192,7 @@ export class ViewerElement3D extends ModelViewerElement {
     }
 
     setMinZoomLevel(minZoomLevel: number): void {
+
         if (this._minZoomLevel == minZoomLevel) {
             return;
         }
@@ -226,6 +227,7 @@ export class ViewerElement3D extends ModelViewerElement {
     }
 
     updateRadiusMode(isRadiusConst: boolean): void {
+
         if (isRadiusConst == this._isRadiusConst) {
             return;
         }
@@ -315,8 +317,9 @@ export class ViewerElement3D extends ModelViewerElement {
     }
 
     private _coordinateLabelIsClicked(event: MouseEvent): boolean {
+
         //Check if if coordinate label is clicked if visible:
-        if(!this._coordinateAxes[0].visible){
+        if (!this._coordinateAxes[0].visible) {
             return false;
         }
 
@@ -376,8 +379,8 @@ export class ViewerElement3D extends ModelViewerElement {
 
         console.log("Single Click")
 
-           //First check if coordinate label is clicked
-        if(this._coordinateLabelIsClicked(event)){
+        //First check if coordinate label is clicked
+        if (this._coordinateLabelIsClicked(event)) {
             return;
         }
 
@@ -400,9 +403,6 @@ export class ViewerElement3D extends ModelViewerElement {
             console.log('no hit result: mouse = ', x, ', ', y);
             return;
         }
-
-
-
 
         const { position, normal } = positionAndNormal;
 
@@ -440,6 +440,7 @@ export class ViewerElement3D extends ModelViewerElement {
     }
 
     private _handleModelLoaded(): void {
+
         const dim = this.getDimensions();
         const maxDim = Math.max(Math.max(dim.x, dim.y), dim.z);
         const axesLength = maxDim * 0.5;
@@ -499,9 +500,6 @@ export class ViewerElement3D extends ModelViewerElement {
         this[$userInputElement].style.cursor = 'default';
         this.minCameraOrbit = "-Infinity " + this._minPhiInDeg + "deg  auto";
         this.maxCameraOrbit = "Infinity " + this._maxPhiInDeg + "deg auto";
-        // this[$userInputElement]
-        //[$controls]
-        this.style.cursor = 'default';
     }
 
     private _handleCameraChanged(event: Event): void {
