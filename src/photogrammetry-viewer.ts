@@ -396,6 +396,7 @@ export class PhotogrammetryViewer extends LitElement {
         border: 2px solid blue;
         width: 95%;
         height: calc(100% - 2*var(--margin));
+        min-height: 400px;
         border: 0;
         background-color: lightgray
     }
