@@ -2,6 +2,7 @@ import { LitElement, css, html } from 'lit'
 import { customElement, property, query } from 'lit/decorators.js';
 import OpenSeadragon, { CanvasPressEvent, TileEvent, ZoomEvent } from "openseadragon";
 import { SingleClickEventHandler, debounce, doubleEventHandler } from './helper';
+import { applyFilters } from './hooks';
 
 import { ViewerSettings } from './viewer-settings'
 import { MeasurementTool } from './measurement-tool';
@@ -163,7 +164,9 @@ export class ViewerElement2D extends LitElement {
       return;
     }
 
-    const imageUrl = this.src2D + this._imageFiles[this._currentImageIdx] + this.imageType;
+    const imageUrl = applyFilters('2d-image-url', this.src2D + this._imageFiles[this._currentImageIdx] + this.imageType);
+    
+
     this._viewer.open({
       type: 'image',
       url: imageUrl
@@ -285,6 +288,7 @@ export class ViewerElement2D extends LitElement {
     this._viewer.updateOverlay(this.hotspotOverlay, viewportPoint, OpenSeadragon.Placement.CENTER)
     console.log("Hotspot in image added")
   }
+
   private _handleCanvasDoublePressEvent(event: CanvasPressEvent) {
 
     this._isDown = true;
