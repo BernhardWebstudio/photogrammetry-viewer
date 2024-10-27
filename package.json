@@ -47,7 +47,7 @@
     "@rollup/plugin-terser": "^0.4.3",
     "@types/events": "^3.0.0",
     "@types/node": "^20.4.7",
-    "@types/openseadragon": "^3.0.6",
+    "@types/openseadragon": "^3.0.10",
     "@types/three": "^0.152.1",
     "typescript": "^5.0.2",
     "vite": "^4.3.9",

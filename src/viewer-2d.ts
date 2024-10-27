@@ -2,7 +2,7 @@ import { LitElement, css, html } from 'lit'
 import { customElement, property, query } from 'lit/decorators.js';
 import OpenSeadragon, { CanvasPressEvent, TileEvent, ZoomEvent } from "openseadragon";
 import { SingleClickEventHandler, debounce, doubleEventHandler } from './helper';
-import { applyFilters } from './hooks';
+import { applyFiltersAsync } from './hooks';
 
 import { ViewerSettings } from './viewer-settings'
 import { MeasurementTool } from './measurement-tool';
@@ -147,7 +147,7 @@ export class ViewerElement2D extends LitElement {
     console.log("Image Files has been set");
   }
 
-  loadNextImage(imageIdx: number): void {
+  async loadNextImage(imageIdx: number): Promise<void> {
 
     if (imageIdx >= this._imageFiles.length) {
       console.log("Image with index", imageIdx, "cannot be loaded because only", this._imageFiles.length, "images exist");
@@ -164,7 +164,7 @@ export class ViewerElement2D extends LitElement {
       return;
     }
 
-    const imageUrl = applyFilters('2d-image-url', this.src2D + this._imageFiles[this._currentImageIdx] + this.imageType);
+    const imageUrl = await applyFiltersAsync('2d-image-url', this.src2D + this._imageFiles[this._currentImageIdx] + this.imageType);
     
 
     this._viewer.open({
