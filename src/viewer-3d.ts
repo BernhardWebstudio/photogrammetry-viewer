@@ -317,9 +317,8 @@ export class ViewerElement3D extends ModelViewerElement {
     }
 
     private _coordinateLabelIsClicked(event: MouseEvent): boolean {
-
-        //Check if if coordinate label is clicked if visible:
-        if (!this._coordinateAxes[0].visible) {
+        // Check if if coordinate label is clicked if visible:
+        if (this._coordinateAxes.length == 0 || !this._coordinateAxes[0].visible) {
             return false;
         }
 
