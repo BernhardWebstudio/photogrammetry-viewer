@@ -1,2 +1,2 @@
 export { PhotogrammetryViewer } from './photogrammetry-viewer'
-export * from './hooks'
+export type { FileResolver } from './file-resolver'

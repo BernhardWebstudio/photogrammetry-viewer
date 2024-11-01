@@ -16,6 +16,7 @@ import { Settings3DViewer, Settings2DViewer } from './sync-settings'
 import { EnvironmentSettings, ImageRotationSettings, ModelOrientationSettings, ViewerSettings } from './viewer-settings'
 import { EulerYXZ } from './eulerYXZ';
 import { MeasurementTool } from './measurement-tool';
+import { DefaultFileResolver, FileResolver } from './file-resolver'
 
 
 /**
@@ -41,6 +42,10 @@ export class PhotogrammetryViewer extends LitElement {
   @property()
   srcScanInformation: string = ''; //'http://localhost:8000/Leptinotarsa_decemlineata_NOKI_metashape_cameras.xml';
 
+  // additional configuration
+  @property({ type: Object })
+  fileResolver: FileResolver | null = null;
+  
   // Components:
   @query('#viewerBase')
   viewerBase!: HTMLDivElement;
@@ -87,6 +92,12 @@ export class PhotogrammetryViewer extends LitElement {
     this._scanInformation.on('scanInformationExtracted', this._handleScanInformationExtracted.bind(this));
     this._imageCamera.on('camera-parameters-changed', this._updateViewer.bind(this));
     this._resizeObserver = new ResizeObserver(this._handleViewerResizeEvent.bind(this));
+
+    if (this.fileResolver == null) {
+      this.fileResolver = new DefaultFileResolver(
+        this.src2D, ".png"
+      )
+    }
   }
 
 
@@ -105,6 +116,7 @@ export class PhotogrammetryViewer extends LitElement {
         </viewer-3d>
         <viewer-2d id="viewer2D" src2D=${this.src2D} 
           .measurementTool ="${this._viewerSettings.measurementTool}"
+          .fileResolver ="${this.fileResolver}"
           @image-zoom-changed ="${this._handleImageZoomChanged}"
           @image-shifted ="${this._handleImageShifted}"
           @min-zoom-level-changed ="${this._handleImageMinZoomLevelChanged}"

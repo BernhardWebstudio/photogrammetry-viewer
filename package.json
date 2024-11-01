@@ -45,7 +45,6 @@
     "@ui5/webcomponents-fiori": "^1.13.3",
     "@ui5/webcomponents-icons": "^1.13.3",
     "@ui5/webcomponents-icons-tnt": "^1.13.3",
-    "@wordpress/hooks": "^4.10.0",
     "events": "^3.3.0",
     "openseadragon": "^4.1.0"
   },
