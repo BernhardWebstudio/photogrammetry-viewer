@@ -213,7 +213,7 @@ export class ViewerElement2D extends LitElement {
       return;
     }
 
-    const imageUrl = this.fileResolver.resolveFile(
+    const imageUrl = await this.fileResolver.resolveFile(
       this._imageFiles[this._currentImageIdx]
     );
 
