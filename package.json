@@ -11,11 +11,17 @@
       "require": "./dist/photogrammetry-viewer.js"
     }
   },
+  "files": [
+    "dist/",
+    "package.json",
+    "README.md"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "test": "echo \"no tests specified\" && exit 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
