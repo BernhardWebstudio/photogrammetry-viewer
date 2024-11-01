@@ -114,6 +114,7 @@ export class ViewerElement3D extends ModelViewerElement {
 
         this[$scene].idealAspect = this[$scene].aspect; //if the format is not "ideal", model-viewer changes the fov values 
     }
+
     getCamera(): Camera {
         return this[$scene].camera;
     }
@@ -153,7 +154,6 @@ export class ViewerElement3D extends ModelViewerElement {
         }
 
     }
-
 
     rotateModel(dx: number, dy: number): void {
         const conversionFactor = 2 * Math.PI / this[$scene].height;
@@ -439,7 +439,6 @@ export class ViewerElement3D extends ModelViewerElement {
     }
 
     private _handleModelLoaded(): void {
-
         const dim = this.getDimensions();
         const maxDim = Math.max(Math.max(dim.x, dim.y), dim.z);
         const axesLength = maxDim * 0.5;
@@ -502,7 +501,6 @@ export class ViewerElement3D extends ModelViewerElement {
     }
 
     private _handleCameraChanged(event: Event): void {
-
         this.measurementTool.translation = new Vector3().setFromMatrixPosition(this[$scene].target.matrixWorld);
 
         const currentCamPosition = this.getCameraOrbit();

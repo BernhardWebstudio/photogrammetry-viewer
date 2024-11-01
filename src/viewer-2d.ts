@@ -13,7 +13,7 @@ import {
 
 import { ViewerSettings } from "./viewer-settings";
 import { MeasurementTool } from "./measurement-tool";
-import { FileResolver } from "./file-resolver";
+import { PhotogrammetryViewerSettings } from "./public-settings";
 
 interface Pointer {
   clientX: number;
@@ -36,7 +36,7 @@ export class ViewerElement2D extends LitElement {
   measurementTool!: MeasurementTool;
 
   @property({ type: Object })
-  fileResolver!: FileResolver;
+  viewSettings!: PhotogrammetryViewerSettings;
 
   private _imageFiles: Array<string> = [];
   private _currentImageIdx: number = -1;
@@ -213,7 +213,7 @@ export class ViewerElement2D extends LitElement {
       return;
     }
 
-    const imageUrl = await this.fileResolver.resolveFile(
+    const imageUrl = await this.viewSettings.resolve2dFileURL(
       this._imageFiles[this._currentImageIdx]
     );
 
