@@ -44,7 +44,7 @@ export class PhotogrammetryViewer extends LitElement {
 
   // additional configuration
   @property({ type: Object })
-  publicViewerSettings: PhotogrammetryViewerSettings | null = null;
+  viewSettings!: PhotogrammetryViewerSettings;
   
   // Components:
   @query('#viewerBase')
@@ -93,8 +93,8 @@ export class PhotogrammetryViewer extends LitElement {
     this._imageCamera.on('camera-parameters-changed', this._updateViewer.bind(this));
     this._resizeObserver = new ResizeObserver(this._handleViewerResizeEvent.bind(this));
 
-    if (this.publicViewerSettings == null) {
-      this.publicViewerSettings = new DefaultPhotogrammetryViewerSettings(
+    if (this.viewSettings == null) {
+      this.viewSettings = new DefaultPhotogrammetryViewerSettings(
         this.src2D, ".png"
       )
     }
@@ -109,7 +109,7 @@ export class PhotogrammetryViewer extends LitElement {
           camera-controls  disable-tap
           camera-orbit="0deg 90deg auto" max-camera-orbit="Infinity 157.5deg auto"  min-camera-orbit="-Infinity 22.5deg auto" camera-target="0m 0m 0m"
           exposure="1.2" shadow-intensity="0" alt="Leptinotarsa" min-field-of-view='0deg' max-field-of-view='18deg'  interaction-prompt="none"
-          skybox-image ="${this.publicViewerSettings?.skyBoxImage}"
+          skybox-image ="${this.viewSettings.skyBoxImage}"
           .measurementTool ="${this._viewerSettings.measurementTool}"
           @fov-based-zoom-changed ="${this._handleFovBasedZoomChanged}"
           @cam-orbit-angle-changed = "${this._updateViewer}"
@@ -117,7 +117,7 @@ export class PhotogrammetryViewer extends LitElement {
         </viewer-3d>
         <viewer-2d id="viewer2D" src2D=${this.src2D} 
           .measurementTool ="${this._viewerSettings.measurementTool}"
-          .fileResolver ="${this.publicViewerSettings}"
+          .viewSettings ="${this.viewSettings}"
           @image-zoom-changed ="${this._handleImageZoomChanged}"
           @image-shifted ="${this._handleImageShifted}"
           @min-zoom-level-changed ="${this._handleImageMinZoomLevelChanged}"
