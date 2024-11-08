@@ -40,9 +40,9 @@ export class EnvironmentSettingsElement extends LitElement {
         <div>    
             <div class = "input-row" >
                 <ui5-label show-colon>Background Color</ui5-label>
-                <ui5-color-palette-item value=${this.environmentSettings.backgroundColor[0]} @click=${this._handleColorClicked}></ui5-color-palette-item>
+                <ui5-color-palette-item value=${this.environmentSettings.backgroundColor[0]} id="color-palette-opener"></ui5-color-palette-item>
             </div> 
-            <ui5-color-palette-popover id="colorPalettePopover" show-more-colors="" @item-click=${this._handleColorChanged}>
+            <ui5-color-palette-popover id="colorPalettePopover" show-more-colors="" @item-click=${this._handleColorChanged} opener="color-palette-opener">
                 <ui5-color-palette-item value="#444444"></ui5-color-palette-item>
                 <ui5-color-palette-item value="lightpink"></ui5-color-palette-item>
                 <ui5-color-palette-item value="rgb(216,124,172)"></ui5-color-palette-item>
@@ -74,10 +74,6 @@ export class EnvironmentSettingsElement extends LitElement {
   private _handleColorChanged(event: CustomEvent) {
     this.environmentSettings.backgroundColor = event.detail.color;
     this.requestUpdate();
-  }
-
-  private _handleColorClicked(event: CustomEvent) {
-    this.colorPalettePopover.showAt(event.target as HTMLElement);
   }
 
   private _handleShowAxesStateChanged(event: CustomEvent) {

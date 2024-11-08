@@ -6,7 +6,7 @@ import "@ui5/webcomponents/dist/CardHeader";
 
 import "@ui5/webcomponents/dist/Title"
 import "@ui5/webcomponents/dist/Button"
-import "@ui5/webcomponents-fiori/dist/Bar";
+import "@ui5/webcomponents/dist/Bar.js";
 import "@ui5/webcomponents-icons/dist/decline";
 
 import "@ui5/webcomponents/dist/Dialog";

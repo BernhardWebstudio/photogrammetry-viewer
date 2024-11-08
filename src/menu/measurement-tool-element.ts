@@ -6,7 +6,7 @@ import "@ui5/webcomponents/dist/Panel";
 import "@ui5/webcomponents/dist/Label";
 import "@ui5/webcomponents/dist/Title";
 import "@ui5/webcomponents/dist/List.js";
-import "@ui5/webcomponents/dist/StandardListItem.js"
+import "@ui5/webcomponents/dist/ListItemStandard.js"
 import { PVMenuItem } from '../ui/pv-menu-item';
 import { MeasurementTool } from '../measurement-tool';
 

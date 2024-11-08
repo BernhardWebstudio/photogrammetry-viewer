@@ -240,13 +240,10 @@ export class PhotogrammetryViewer extends LitElement {
   }
 
   private _handleViewerResizeEvent() {
-
-    this.viewerBase.style.setProperty('--margin', this.viewerBase.offsetWidth * 0.025 + 'px');
     this._updateViewerSize();
   }
 
   private _updateViewerSize() {
-
     if (this._viewModeIndex == 0) //oneview sync mode
     {
       this._viewerAspectRatio = this.viewerBase.offsetWidth / this.viewerBase.offsetHeight; //has to be before resizing"
@@ -404,11 +401,10 @@ export class PhotogrammetryViewer extends LitElement {
     }
 
     #viewerBase {
-        --margin: 0px;
         position: relative;
         border: 2px solid blue;
-        width: 95%;
-        height: calc(100% - 2*var(--margin));
+        width: 100%;
+        height: 100%;
         min-height: 400px;
         border: 0;
         background-color: lightgray
