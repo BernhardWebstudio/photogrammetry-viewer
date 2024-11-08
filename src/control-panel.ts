@@ -158,7 +158,8 @@ export class ControlPanel extends LitElement {
     event: CustomEvent<SegmentedButtonSelectionChangeEventDetail>
   ) {
     const selectedItem: ISegmentedButtonItem = event.detail.selectedItems[0];
-    if (selectedItem.ariaPosInSet == null) {
+    const posInSet: string|null = selectedItem.getAttribute("pos-in-set") ?? selectedItem.ariaPosInSet;
+    if (posInSet == null) {
       console.warn(
         "Selected item does not have an ariaPosInSet property. Check your segmented button implementation.",
         selectedItem
@@ -166,7 +167,7 @@ export class ControlPanel extends LitElement {
     }
     const selectedIndex: number =
       parseInt(
-        selectedItem.ariaPosInSet == null ? "" : selectedItem.ariaPosInSet,
+        posInSet == null ? "" : posInSet,
         10
       ) - 1;
     if (selectedIndex == this.currentViewModeIndex) {
