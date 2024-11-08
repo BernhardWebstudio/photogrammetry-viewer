@@ -1,6 +1,8 @@
 import { LitElement, css, html } from 'lit'
 import { customElement, property } from 'lit/decorators.js';
 
+// import type {SegmentedButtonSelectionChangeEventDetail} from "@ui5/webcomponents";
+
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { registerIcon } from "@ui5/webcomponents-base/dist/asset-registries/Icons.js";
 import { TemplateFunction } from "@ui5/webcomponents-base/dist/renderer/executeTemplate.js";
@@ -29,6 +31,7 @@ import './ui/pv-menu-item.ts';
 import './menu/environment-settings-element.ts'
 import './menu/rotation-settings-element.ts'
 import './menu/measurement-tool-element.ts'
+import { SegmentedButtonSelectionChangeEventDetail } from '@ui5/webcomponents/dist/SegmentedButton.js';
 
 const icons: Record<string, TemplateFunction> = {
   "doubleview": () => { return unsafeSVG(doubleviewIcon) },
@@ -61,7 +64,7 @@ export class ControlPanel extends LitElement {
 
   render() {
     return html`
-          <ui5-segmented-button id="viewModeBtn" class="${this.isColumnMode ? "ver-orientation" : "hor-orientation"}" @selection-change= "${this._handleSelectionChanged}">
+          <ui5-segmented-button id="viewModeBtn" class="${this.isColumnMode ? "ver-orientation" : "hor-orientation"}" @selection-change="${this._handleSelectionChanged}">
               <ui5-segmented-button-item tooltip="One View Mode" ?pressed=${this.currentViewModeIndex == 0}>
                 <ui5-icon name="${this.isColumnMode ? "custom/singleview-mobile" : "custom/singleview"}" class="${this.isColumnMode ? "rotated-icon" : ""}"></ui5-icon>
               </ui5-segmented-button-item>
@@ -96,7 +99,7 @@ export class ControlPanel extends LitElement {
         `
   }
 
-  private _handleSelectionChanged(event: CustomEvent) {
+  private _handleSelectionChanged(event: CustomEvent<SegmentedButtonSelectionChangeEventDetail>) {
     /*const selectedItems = event.detail.selectedItems;
 
     if (!selectedItems?.length) {
@@ -104,8 +107,8 @@ export class ControlPanel extends LitElement {
     }
 
     const selectedItem = selectedItems[0];*/  //<-- ui5 webcomponents version > 1.14
-    const selectedItem = event.detail.selectedItem;
-    const selectedIndex = selectedItem.posInSet - 1;
+    const selectedItem = event.detail.selectedItems[0];
+    const selectedIndex = parseInt(selectedItem.ariaPosInSet ?? "") - 1;
     if (selectedIndex == this.currentViewModeIndex) {
       return;
     }
