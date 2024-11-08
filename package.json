@@ -45,6 +45,7 @@
     "@ui5/webcomponents-fiori": "^2.4.0",
     "@ui5/webcomponents-icons": "^2.4.0",
     "@ui5/webcomponents-icons-tnt": "^2.4.0",
+    "@ulb-darmstadt/photogrammetry-viewer": "github:BernhardWebstudio/photogrammetry-viewer",
     "events": "^3.3.0",
     "openseadragon": "^5.0.0"
   },
