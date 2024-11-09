@@ -23,6 +23,9 @@ export class EnvironmentSettingsElement extends LitElement {
   @query("#colorPalettePopover")
   colorPalettePopover!: ColorPalettePopover;
 
+  @query("#color-palette-opener")
+  colorPaletteOpener!: HTMLElement;
+
   //TO DO: Brightness
   render() {
     return html`
@@ -42,18 +45,19 @@ export class EnvironmentSettingsElement extends LitElement {
           class="${this.isColumnMode ? "ver-orientation" : "hor-orientation"}"
         ></div>
         <div>
-          <div class="input-row">
-            <ui5-label show-colon>Background Color</ui5-label>
+          <div class="input-row" @click="${this._togglePalette}">
+            <ui5-label show-colon for="color-palette-opener"
+              >Background Color</ui5-label
+            >
             <ui5-color-palette-item
               value=${this.environmentSettings.backgroundColor[0]}
               id="color-palette-opener"
-              @click=${this._togglePalette()}
             ></ui5-color-palette-item>
           </div>
           <ui5-color-palette-popover
             id="colorPalettePopover"
             show-more-colors=""
-            @item-click=${this._handleColorChanged}
+            @item-click="${this._handleColorChanged}"
           >
             <ui5-color-palette-item value="#444444"></ui5-color-palette-item>
             <ui5-color-palette-item value="lightpink"></ui5-color-palette-item>
@@ -106,8 +110,15 @@ export class EnvironmentSettingsElement extends LitElement {
   }
 
   private _togglePalette() {
+    console.log("toggling palette");
+    if (typeof this.colorPalettePopover.opener === 'undefined') {
+      this.colorPalettePopover.opener = this.colorPaletteOpener;
+    }
+
     if (this.colorPalettePopover !== null) {
       this.colorPalettePopover.open = !this.colorPalettePopover.open;
+    } else {
+      console.warn("Color palette popover is null");
     }
   }
 
