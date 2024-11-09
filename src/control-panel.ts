@@ -233,11 +233,5 @@ export class ControlPanel extends LitElement {
       pointer-events: none;
       transform: translateY(2.5%);
     }
-
-    [pressed] ui5-icon {
-      color: white;
-      stroke: white;
-      fill: white;
-    }
   `;
 }

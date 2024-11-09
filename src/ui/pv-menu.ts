@@ -126,7 +126,7 @@ export class PVMenu extends LitElement {
       flex-direction: column;
     }
 
-    #toolBar{
+    #toolBar {
       display: flex;
       gap: 0.5625rem;
       left: 0.5rem;
@@ -158,12 +158,6 @@ export class PVMenu extends LitElement {
       fill: black;
       pointer-events: none;
       transform: translateY(2.5%)
-    }
-
-    [pressed] ui5-icon {
-      color:white;
-      stroke:white;
-      fill: white;
     }
   `
 }

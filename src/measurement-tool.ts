@@ -110,6 +110,7 @@ export class MeasurementTool extends EventEmitter {
     addPointFromImage(imageXCoor: number, imageYCoor: number): void {
 
         if(this._imageSensor == null){
+            console.warn("Cannot add point from image, since image sensor is null.");
             return;
         }
  
@@ -144,6 +145,7 @@ export class MeasurementTool extends EventEmitter {
         this._measurementPoints.push(measurementPoint);
 
         if (!this._isActive) {
+            console.warn("Cannot add point from 3D scene, since measurement tool is not active.");
             measurementPoint.hide();
         }
 
@@ -183,7 +185,7 @@ export class MeasurementTool extends EventEmitter {
             point.delete();
         });
 
-        this._measurementPoints.length = 0;
+        this._measurementPoints = [];
         this._measuredLength = 0;
 
         this._measurementDistances.forEach((distance) => {
