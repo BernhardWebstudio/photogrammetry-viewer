@@ -224,7 +224,8 @@ export class MeasurementTool extends EventEmitter {
 
     private _updateHotspotInImage(hotspotPosition: Vector3){
         
-        if(!this.isActive || this._imageSensor == null){
+        if (!this.isActive || this._imageSensor == null) {
+            console.warn("Cannot update hotspot in image: not active, or image sensor null.")
             return;
         }
 

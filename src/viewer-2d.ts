@@ -335,6 +335,7 @@ export class ViewerElement2D extends LitElement {
 
   private _handleSingleClickEvent(event: PointerEvent) {
     if (this._viewer == null || !this.measurementTool.isEditModeActive) {
+      console.log("Single click event: ignoring, viewer null or measurement tool not active.");
       return;
     }
     const rect = this.parentElement.getBoundingClientRect();

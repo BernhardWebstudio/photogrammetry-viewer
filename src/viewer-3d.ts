@@ -294,6 +294,7 @@ export class ViewerElement3D extends ModelViewerElement {
         var hit = hits.find((hit) => hit.object.visible && !hit.object.userData.shadow);
 
         if (hit == null || hit.face == null) {
+            console.log("Object intersection not found, not adding point from 3D scene.");
             return;
         }
 
@@ -376,7 +377,7 @@ export class ViewerElement3D extends ModelViewerElement {
 
     private _handleSceneClicked(event: MouseEvent) {
 
-        console.log("Single Click")
+        console.log("Single Click into scene")
 
         //First check if coordinate label is clicked
         if (this._coordinateLabelIsClicked(event)) {
