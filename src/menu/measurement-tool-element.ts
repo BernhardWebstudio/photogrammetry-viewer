@@ -58,6 +58,11 @@ export class MeasurementToolElement extends PVMenuItem {
 
   updated(changedProperties: Map<string, unknown>) {
     super.updated(changedProperties);
+
+    if (changedProperties.has("isSelected")) {
+      // activate measurement tool if this menu item is open
+      this.measurementTool.isActive = this.isSelected;
+    }
   }
 
   private _handleNewPathClicked() {
