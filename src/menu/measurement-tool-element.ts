@@ -13,7 +13,7 @@ import { MeasurementTool } from "../measurement-tool";
 @customElement("measurement-tool")
 export class MeasurementToolElement extends PVMenuItem {
   @property({ type: Boolean })
-  isColumnMode: boolean = false;
+  isColumnMode: boolean = true;
 
   @property({ type: Object })
   measurementTool!: MeasurementTool;
@@ -25,11 +25,7 @@ export class MeasurementToolElement extends PVMenuItem {
         class="${this.isColumnMode ? "ver-orientation" : "hor-orientation"}"
       >
         <div class="row">
-          <div
-            class="alignCenter ${this.isColumnMode
-              ? "ver-orientation"
-              : "hor-orientation"}"
-          >
+          <div class="alignCenter">
             <ui5-label level="H1">&Sigma;:</ui5-label>
             <ui5-label
               >${this.measurementTool.measuredLength.toFixed(1)}</ui5-label
@@ -38,18 +34,10 @@ export class MeasurementToolElement extends PVMenuItem {
           </div>
         </div>
         <div class="row">
-          <div
-            class="alignCenter ${this.isColumnMode
-              ? "ver-orientation"
-              : "hor-orientation"}"
-          >
+          <div class="alignCenter">
             <ui5-button @click="${this._handleNewPathClicked}">New</ui5-button>
           </div>
-          <div
-            class="alignCenter ${this.isColumnMode
-              ? "ver-orientation"
-              : "hor-orientation"}"
-          >
+          <div class="alignCenter">
             <ui5-button
               ?disabled="${!this.measurementTool.isEditModeActive &&
               this.measurementTool.numPoints == 0}"
@@ -91,7 +79,7 @@ export class MeasurementToolElement extends PVMenuItem {
 
   static styles = css`
     :host {
-      min-width: 20em;
+      min-width: 15em;
       height: 100%;
       width: 100%;
     }
@@ -108,6 +96,7 @@ export class MeasurementToolElement extends PVMenuItem {
 
     #layout {
       position: relative;
+      min-width: 15em;
       display: flex;
       align-items: stretch;
       flex-direction: column;
@@ -120,20 +109,14 @@ export class MeasurementToolElement extends PVMenuItem {
       flex-direction: row;
       gap: 1rem;
       justify-content: space-between;
-    }
-
-    .alignCenter.ver-orientation {
       width: 100%;
-      justify-content: center;
-    }
-
-    .alignCenter.hor-orientation {
-      height: 100%;
-      align-items: center;
     }
 
     .alignCenter {
+      width: 100%;
       display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     ui5-button {
