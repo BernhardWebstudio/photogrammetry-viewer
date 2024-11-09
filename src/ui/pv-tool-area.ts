@@ -9,7 +9,8 @@ import "@ui5/webcomponents/dist/Button"
 import "@ui5/webcomponents/dist/Bar.js";
 import "@ui5/webcomponents-icons/dist/decline";
 
-import "@ui5/webcomponents/dist/Popover";
+import "@ui5/webcomponents/dist/Dialog";
+
 
 @customElement('pv-tool-area')
 export class ToolAreaPopover extends LitElement {
@@ -25,9 +26,24 @@ export class ToolAreaPopover extends LitElement {
 
     render() {
         return html`
-            <ui5-popover id="dialog" header-text="${this.title}">
+        	<span id="arrow" class="${this.isColumnMode ? "show-up" : "show-left"}" ></span>
+            <ui5-dialog id="dialog">
+                <ui5-bar slot="header" design="Header"> 
+                    <ui5-title level="H6" slot="startContent">
+                        ${this.title}
+                    </ui5-title>
+                    <ui5-button
+                        @click="${this._handleExitClicked}" 
+                        design="Transparent"
+                        id="closeDialogButton"
+                        slot="endContent"
+                        icon="decline"
+                    ></ui5-button>
+                </ui5-bar>
                 <slot id="content" class="${this.isColumnMode ? "ver-orientation" : "hor-orientation"}" ></slot>
-            </ui5-popover>
+            </ui5-dialog>
+
+           
         `
     } 
 
@@ -38,6 +54,11 @@ export class ToolAreaPopover extends LitElement {
     show(arrowOffset: number) {
         this.style.display = "flex";
         this.style.setProperty('--arrowOffset', arrowOffset + 'px');
+    }
+
+    private _handleExitClicked() {
+        this.style.display = "none";
+        this.dispatchEvent(new Event('tool-area-closed'));
     }
 
     static styles = css`
@@ -75,6 +96,47 @@ export class ToolAreaPopover extends LitElement {
     }
     #content.hor-orientation{
         height: 100%;
+    }
+
+    #arrow{
+        pointer-events: none;
+        display: block;
+        width: 1rem;
+        height: 1rem;
+        position: absolute;
+        overflow: hidden;
+    }
+
+    #arrow:after {
+        content: "";
+        display: block;
+        width: 0.7rem;
+        height: 0.7rem;
+        background-color: var(--sapGroup_ContentBackground);
+        box-shadow: var(--sapContent_Shadow3);
+        transform: rotate(-45deg);
+    }
+
+    #arrow.show-up{
+        height: 0.5625rem;
+        top: -0.5rem;
+        left: -0.5625rem;
+        transform: translate(var(--arrowOffset), 0px);
+    }
+    #arrow.show-up:after{
+        margin: var(--_ui5_popover_upward_arrow_margin);
+    }
+
+    #arrow.show-left{
+        left: -0.5625rem;
+        top: -0.5625rem;
+        width: 0.5625rem;
+        height: 1rem;
+        transform: translate(0px,var(--arrowOffset));
+    }
+
+    #arrow.show-left:after {
+        margin: var(--_ui5_popover_left_arrow_margin);
     }
   `
 }

@@ -43,21 +43,17 @@ export class EnvironmentSettingsElement extends LitElement {
         ></div>
         <div>
           <div class="input-row">
-          <ui5-button id="color-palette-opener" design="Transparent" type="Button">
-            <ui5-label show-colon for="color-palette-current"
-              >Background Color</ui5-label
-            >
+            <ui5-label show-colon>Background Color</ui5-label>
             <ui5-color-palette-item
               value=${this.environmentSettings.backgroundColor[0]}
-              id="color-palette-current"
+              id="color-palette-opener"
+              @click=${this._togglePalette()}
             ></ui5-color-palette-item>
-            </ui5-button>
           </div>
           <ui5-color-palette-popover
             id="colorPalettePopover"
             show-more-colors=""
             @item-click=${this._handleColorChanged}
-            opener="color-palette-opener"
           >
             <ui5-color-palette-item value="#444444"></ui5-color-palette-item>
             <ui5-color-palette-item value="lightpink"></ui5-color-palette-item>
