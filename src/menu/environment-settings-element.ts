@@ -109,12 +109,6 @@ export class EnvironmentSettingsElement extends LitElement {
     this.requestUpdate();
   }
 
-  private _togglePalette() {
-    if (this.colorPalettePopover !== null) {
-      this.colorPalettePopover.open = !this.colorPalettePopover.open;
-    }
-  }
-
   private _handleShowAxesStateChanged(event: CustomEvent) {
     this.environmentSettings.showAxes = (
       event.target as HTMLInputElement
