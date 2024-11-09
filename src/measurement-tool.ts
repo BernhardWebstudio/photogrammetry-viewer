@@ -6,7 +6,6 @@ import { Sensor } from './sensor';
 
 export class MeasurementTool extends EventEmitter {
 
-    private _isActive = false; //
     private _isEditModeActive = false;
 
     private _measurementPoints: MeasurementPoint[] = [];
@@ -38,25 +37,6 @@ export class MeasurementTool extends EventEmitter {
 
     get sceneElementGroup(): Group {
         return this._sceneElementGroup;
-    }
-
-    set isActive(isActive: boolean) {
-        if (this._isActive == isActive) {
-            return;
-        }
-        this._isActive = isActive;
-
-        if (isActive) {
-            this.showPoints();
-        }
-        else {
-            this.hidePoints();
-            this.isEditModeActive = false;
-        }
-    }
-
-    get isActive(): boolean {
-        return this._isActive;
     }
 
     set isEditModeActive(isEditModeActive: boolean) {
@@ -144,11 +124,6 @@ export class MeasurementTool extends EventEmitter {
 
         this._measurementPoints.push(measurementPoint);
 
-        if (!this._isActive) {
-            console.warn("Cannot add point from 3D scene, since measurement tool is not active.");
-            measurementPoint.hide();
-        }
-
         //distance to previous point
         if (currentIndex > 0) {
 
@@ -166,10 +141,6 @@ export class MeasurementTool extends EventEmitter {
 
             this.emit('hotspot-added', newMeasurementDistance.annotationElement);
             this.emit('update-requested');
-
-            if (!this._isActive) {
-                newMeasurementDistance.hide();
-            }
         }
 
         this.emit('hotspot-added', measurementPoint.domElement);
@@ -224,8 +195,8 @@ export class MeasurementTool extends EventEmitter {
 
     private _updateHotspotInImage(hotspotPosition: Vector3){
         
-        if (!this.isActive || this._imageSensor == null) {
-            console.warn("Cannot update hotspot in image: not active, or image sensor null.")
+        if (this._imageSensor == null) {
+            console.warn("Cannot update hotspot in image: image sensor null.")
             return;
         }
 

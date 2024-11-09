@@ -96,7 +96,7 @@ export class PhotogrammetryViewer extends LitElement {
     if (this.viewSettings == null) {
       this.viewSettings = new DefaultPhotogrammetryViewerSettings(
         this.src2D, ".png"
-      )
+      );
     }
   }
 
