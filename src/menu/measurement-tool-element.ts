@@ -1,4 +1,4 @@
-import { css, html } from "lit";
+import { css, html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 import "@ui5/webcomponents/dist/Button";
@@ -7,11 +7,10 @@ import "@ui5/webcomponents/dist/Label";
 import "@ui5/webcomponents/dist/Title";
 import "@ui5/webcomponents/dist/List.js";
 import "@ui5/webcomponents/dist/ListItemStandard.js";
-import { PVMenuItem } from "../ui/pv-menu-item";
 import { MeasurementTool } from "../measurement-tool";
 
 @customElement("measurement-tool")
-export class MeasurementToolElement extends PVMenuItem {
+export class MeasurementToolElement extends LitElement {
   @property({ type: Boolean })
   isColumnMode: boolean = true;
 
@@ -27,25 +26,26 @@ export class MeasurementToolElement extends PVMenuItem {
         <div class="row">
           <div class="alignCenter">
             <ui5-label level="H1">&Sigma;:</ui5-label>
-            <ui5-label
-              >${this.measurementTool.measuredLength.toFixed(1)}</ui5-label
-            >
+            <ui5-label>
+              ${this.measurementTool.measuredLength.toFixed(1)}
+            </ui5-label>
             <ui5-label> mm</ui5-label>
           </div>
         </div>
         <div class="row">
           <div class="alignCenter">
-            <ui5-button @click="${this._handleNewPathClicked}">New</ui5-button>
+            <ui5-button @click="${this._handleNewPathClicked}">
+              ${this.measurementTool.numPoints > 0 ? "Reset" : "New"}
+            </ui5-button>
           </div>
           <div class="alignCenter">
             <ui5-button
               ?disabled="${!this.measurementTool.isEditModeActive &&
               this.measurementTool.numPoints == 0}"
               @click="${this._handleUpdateEditStateClicked}"
-              >${this.measurementTool.isEditModeActive
-                ? "Stop"
-                : "Continue"}</ui5-button
             >
+              ${this.measurementTool.isEditModeActive ? "Stop" : "Continue"}
+            </ui5-button>
           </div>
         </div>
       </div>

@@ -1,4 +1,8 @@
 import Popover from "@ui5/webcomponents/dist/Popover.js";
+
+import "@ui5/webcomponents/dist/Button";
+import "@ui5/webcomponents/dist/Popover";
+
 import { LitElement, css, html } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 
@@ -10,30 +14,26 @@ export class PVMenuItem extends LitElement {
   @property()
   icon: string = "";
 
-  @property({ type: Boolean, reflect: true })
-  isSelected: boolean = false;
-
   @property()
   idx: number = 0;
 
   @query("#tool-popover")
   toolPopover!: Popover;
 
+  @query("#tool-button")
+  toolButton!: HTMLElement;
+
   render() {
     return html`
-      <ui5-toggle-button
+      <ui5-button
         data-index=${this.idx}
         tooltip=${this.title}
         id="tool-button"
         @click="${this._togglePopover}"
         icon=${this.icon}
       >
-      </ui5-toggle-button>
-      <ui5-popover
-        id="tool-popover"
-        opener="tool-button"
-        header-text="${this.title}"
-      >
+      </ui5-button>
+      <ui5-popover id="tool-popover" header-text="${this.title}">
         <slot></slot>
       </ui5-popover>
     `;
@@ -41,6 +41,10 @@ export class PVMenuItem extends LitElement {
 
   _togglePopover() {
     if (this.toolPopover !== null) {
+      if (typeof this.toolPopover.opener == "undefined") {
+        this.toolPopover.opener = this.toolButton;
+      }
+
       this.toolPopover.open = !this.toolPopover.open;
     } else {
       console.warn("Popover not found.");

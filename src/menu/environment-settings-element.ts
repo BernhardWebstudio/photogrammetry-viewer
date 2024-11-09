@@ -23,6 +23,9 @@ export class EnvironmentSettingsElement extends LitElement {
   @query("#colorPalettePopover")
   colorPalettePopover!: ColorPalettePopover;
 
+  @query("#color-palette-current")
+  colorPaletteToggle!: HTMLElement;
+
   //TO DO: Brightness
   render() {
     return html`
@@ -43,20 +46,14 @@ export class EnvironmentSettingsElement extends LitElement {
         ></div>
         <div>
           <div class="input-row">
-            <ui5-button
-              id="color-palette-opener"
-              design="Transparent"
-              type="Button"
-              @click=${this._toggleColorPalette}
-            >
               <ui5-label show-colon for="color-palette-current"
                 >Background Color</ui5-label
               >
               <ui5-color-palette-item
                 value=${this.environmentSettings.backgroundColor[0]}
+              @click=${this._toggleColorPalette}
                 id="color-palette-current"
               ></ui5-color-palette-item>
-            </ui5-button>
           </div>
           <ui5-color-palette-popover
             id="colorPalettePopover"
@@ -110,6 +107,10 @@ export class EnvironmentSettingsElement extends LitElement {
 
   private _toggleColorPalette() {
     if (this.colorPalettePopover !== null) {
+      if (typeof this.colorPalettePopover.opener == "undefined") {
+        this.colorPalettePopover.opener = this.colorPaletteToggle;
+      }
+
       this.colorPalettePopover.open = !this.colorPalettePopover.open;
     }
   }
