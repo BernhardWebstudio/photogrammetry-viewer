@@ -128,13 +128,13 @@ export class ControlPanel extends LitElement {
           </ui5-segmented-button>
 
           <pv-menu ?isColumnMode=${this.isColumnMode}>
-            <pv-menu-item icon="custom/environment3D" title="3D Environment">
+            <pv-menu-item icon="custom/environment3D" title="3D Environment" idx="1">
               <environment-settings 
                   ?isColumnMode=${this.isColumnMode}
                   .environmentSettings="${this.viewerSettings.environment3D}">
                 </environment-settings > 
             </pv-menu-item>
-            <pv-menu-item icon="custom/rotation" title="Rotation Settings">
+            <pv-menu-item icon="custom/rotation" title="Rotation Settings" idx="2">
                 <rotation-settings 
                   ?isColumnMode=${this.isColumnMode}
                   ?isAutoRotationDisabled="${this.currentViewModeIndex < 2}"
@@ -144,7 +144,7 @@ export class ControlPanel extends LitElement {
                   }">
                 </rotation-settings> 
             </pv-menu-item>
-            <measurement-tool icon="custom/measure" title="Measurement Tool"
+            <measurement-tool icon="custom/measure" title="Measurement Tool" idx="3"
               ?isColumnMode=${this.isColumnMode}
               .measurementTool="${
                 this.viewerSettings.measurementTool
