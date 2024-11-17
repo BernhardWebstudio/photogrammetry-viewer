@@ -40,14 +40,15 @@
     "url": "https://github.com/ULB-Darmstadt/photogrammetry-viewer/issues"
   },
   "dependencies": {
-    "@google/model-viewer": "^4.0.0",
     "@ui5/webcomponents": "^2.4.0",
     "@ui5/webcomponents-fiori": "^2.4.0",
     "@ui5/webcomponents-icons": "^2.4.0",
     "@ui5/webcomponents-icons-tnt": "^2.4.0",
-    "@ulb-darmstadt/photogrammetry-viewer": "github:BernhardWebstudio/photogrammetry-viewer",
     "events": "^3.3.0",
     "openseadragon": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@google/model-viewer": "^4.0.0",
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.3",
