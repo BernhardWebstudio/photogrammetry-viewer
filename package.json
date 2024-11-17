@@ -48,7 +48,7 @@
     "openseadragon": "^5.0.0"
   },
   "peerDependencies": {
-    "@google/model-viewer": "^4.0.0",
+    "@google/model-viewer": "^4.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.3",
