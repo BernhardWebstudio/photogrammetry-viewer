@@ -16,7 +16,7 @@ export default defineConfig({
     }
   },
   plugins: [
-    peerDepsExternal(),
+    // peerDepsExternal(),
     dts({
       insertTypesEntry: true,
     }),

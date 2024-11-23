@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import { EulerYXZ } from './eulerYXZ';
 import { MeasurementTool } from './measurement-tool';
 import { ColorRGB, getRGBColor } from "@ui5/webcomponents-base/dist/util/ColorConversion.js";
+import { Vector3 } from 'three';
 
 
 function convertColorRGBToString(color: ColorRGB): string {
@@ -108,6 +109,7 @@ export class ImageRotationSettings extends EventEmitter {
 export class EnvironmentSettings extends EventEmitter {
 
     private _showAxes: boolean = true;
+    private _remapAxes: Vector3 = new Vector3(0, 1, 2);
 
     private _backgroundColor: string = "#444444"
     private _gradientColor: string = "#b9b9b9"
@@ -122,8 +124,22 @@ export class EnvironmentSettings extends EventEmitter {
         this._showAxes = showAxes;
         this.emit('change-axes-visibility-requested', this._showAxes);
     }
+
     get showAxes(): boolean {
         return this._showAxes;
+    }
+
+    set remapAxes(newAxes: Vector3) {
+        if (this._remapAxes == newAxes) {
+            return;
+        }
+        console.log("Remapped axes to ", newAxes);
+        this._remapAxes = newAxes;
+        this.emit("change-axes-mapping-requested", this.remapAxes);
+    }
+
+    get remapAxes(): Vector3 {
+        return this._remapAxes;
     }
 
     set backgroundColor(backgroundColor: string) {

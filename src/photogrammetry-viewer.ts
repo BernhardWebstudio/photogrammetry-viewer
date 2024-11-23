@@ -1,23 +1,31 @@
-import { LitElement, css, html } from 'lit'
-import { customElement, property, query } from 'lit/decorators.js'
+import { LitElement, css, html } from "lit";
+import { customElement, property, query } from "lit/decorators.js";
 
-import './viewer-3d'
-import { ViewerElement3D } from './viewer-3d'
+import "./viewer-3d";
+import { ViewerElement3D } from "./viewer-3d";
 
-import './viewer-2d'
-import { ViewerElement2D } from './viewer-2d'
+import "./viewer-2d";
+import { ViewerElement2D } from "./viewer-2d";
 
-import './control-panel'
-import { ControlPanel } from './control-panel';
+import "./control-panel";
+import { ControlPanel } from "./control-panel";
 
-import { ScanInformation } from './scan-information'
-import { ImageCamera } from './image-camera'
-import { Settings3DViewer, Settings2DViewer } from './sync-settings'
-import { EnvironmentSettings, ImageRotationSettings, ModelOrientationSettings, ViewerSettings } from './viewer-settings'
-import { EulerYXZ } from './eulerYXZ';
-import { MeasurementTool } from './measurement-tool';
-import { DefaultPhotogrammetryViewerSettings, PhotogrammetryViewerSettings } from './public-settings'
-
+import { ScanInformation } from "./scan-information";
+import { ImageCamera } from "./image-camera";
+import { Settings3DViewer, Settings2DViewer } from "./sync-settings";
+import {
+  EnvironmentSettings,
+  ImageRotationSettings,
+  ModelOrientationSettings,
+  ViewerSettings,
+} from "./viewer-settings";
+import { EulerYXZ } from "./eulerYXZ";
+import { MeasurementTool } from "./measurement-tool";
+import {
+  DefaultPhotogrammetryViewerSettings,
+  PhotogrammetryViewerSettings,
+} from "./public-settings";
+import { Vector3 } from "three";
 
 /**
  * An example element.
@@ -25,38 +33,37 @@ import { DefaultPhotogrammetryViewerSettings, PhotogrammetryViewerSettings } fro
  * @slot - This element has a slot
  * @csspart button - The button
  */
-@customElement('photogrammetry-viewer')
+@customElement("photogrammetry-viewer")
 export class PhotogrammetryViewer extends LitElement {
-
   //zup to yup applied
   @property({ type: Boolean })
   isYupTransformApplied: boolean = false;
 
   //src file names:
   @property()
-  src3D: string = ''; //'http://localhost:8000/3D/Yup.gltf';
+  src3D: string = ""; //'http://localhost:8000/3D/Yup.gltf';
 
   @property()
-  src2D: string = ''; //'http://localhost:8000/edof/';
+  src2D: string = ""; //'http://localhost:8000/edof/';
 
   @property()
-  srcScanInformation: string = ''; //'http://localhost:8000/Leptinotarsa_decemlineata_NOKI_metashape_cameras.xml';
+  srcScanInformation: string = ""; //'http://localhost:8000/Leptinotarsa_decemlineata_NOKI_metashape_cameras.xml';
 
   // additional configuration
   @property({ type: Object })
   viewSettings!: PhotogrammetryViewerSettings;
-  
+
   // Components:
-  @query('#viewerBase')
+  @query("#viewerBase")
   viewerBase!: HTMLDivElement;
 
-  @query('#viewer3D')
+  @query("#viewer3D")
   viewer3DElement!: ViewerElement3D;
 
-  @query('#viewer2D')
+  @query("#viewer2D")
   viewer2DElement!: ViewerElement2D;
 
-  @query('#controls')
+  @query("#controls")
   controlsElement!: ControlPanel;
 
   //additional private classes:
@@ -68,6 +75,7 @@ export class PhotogrammetryViewer extends LitElement {
   private _viewerAspectRatio: number = 1;
 
   private _viewerSettings: ViewerSettings;
+  private _defaultViewSettings: boolean = false;
 
   private _viewModeIndex: number = 2;
 
@@ -84,53 +92,91 @@ export class PhotogrammetryViewer extends LitElement {
       imageRotation: new ImageRotationSettings(),
       modelOrientation: new ModelOrientationSettings(),
       measurementTool: new MeasurementTool(),
-      environment3D: new EnvironmentSettings()
+      environment3D: new EnvironmentSettings(),
     };
 
-    this._viewerSettings.modelOrientation.on('model-orientation-changed', (newOrientation: EulerYXZ) => this._imageCamera.setAdditionalRotation(newOrientation));
+    this._viewerSettings.modelOrientation.on(
+      "model-orientation-changed",
+      (newOrientation: EulerYXZ) =>
+        this._imageCamera.setAdditionalRotation(newOrientation)
+    );
+    this._viewerSettings.environment3D.on(
+      "change-axes-mapping-requested",
+      (newAxes: Vector3) => {
+        console.log("Setting new axes mapping");
+        this._imageCamera.setAxesRemapping(newAxes);
+      }
+    );
 
-    this._scanInformation.on('scanInformationExtracted', this._handleScanInformationExtracted.bind(this));
-    this._imageCamera.on('camera-parameters-changed', this._updateViewer.bind(this));
-    this._resizeObserver = new ResizeObserver(this._handleViewerResizeEvent.bind(this));
+    this._scanInformation.on(
+      "scanInformationExtracted",
+      this._handleScanInformationExtracted.bind(this)
+    );
+    this._imageCamera.on(
+      "camera-parameters-changed",
+      this._updateViewer.bind(this)
+    );
+    this._resizeObserver = new ResizeObserver(
+      this._handleViewerResizeEvent.bind(this)
+    );
 
     if (this.viewSettings == null) {
       this.viewSettings = new DefaultPhotogrammetryViewerSettings(
-        this.src2D, ".png"
+        this.src2D,
+        ".png"
       );
+      this._defaultViewSettings = true;
     }
   }
-
 
   render() {
     return html`
       <div id="viewerBase">
-        <viewer-3d id="viewer3D" 
+        <viewer-3d
+          id="viewer3D"
           src=${this.src3D}
-          camera-controls  disable-tap
-          camera-orbit="0deg 90deg auto" max-camera-orbit="Infinity 157.5deg auto"  min-camera-orbit="-Infinity 22.5deg auto" camera-target="0m 0m 0m"
-          exposure="1.2" shadow-intensity="0" alt="Leptinotarsa" min-field-of-view='0deg' max-field-of-view='18deg'  interaction-prompt="none"
-          skybox-image ="${this.viewSettings.skyBoxImage}"
-          .measurementTool ="${this._viewerSettings.measurementTool}"
-          @fov-based-zoom-changed ="${this._handleFovBasedZoomChanged}"
-          @cam-orbit-angle-changed = "${this._updateViewer}"
-          @dblclick = "${this._updateOneViewSyncMode}"  > 
+          camera-controls
+          disable-tap
+          camera-orbit="0deg 90deg auto"
+          max-camera-orbit="Infinity 157.5deg auto"
+          min-camera-orbit="-Infinity 22.5deg auto"
+          camera-target="0m 0m 0m"
+          exposure="1.2"
+          shadow-intensity="0"
+          alt="Leptinotarsa"
+          min-field-of-view="0deg"
+          max-field-of-view="18deg"
+          interaction-prompt="none"
+          skybox-image="${this.viewSettings.skyBoxImage}"
+          .measurementTool="${this._viewerSettings.measurementTool}"
+          @fov-based-zoom-changed="${this._handleFovBasedZoomChanged}"
+          @cam-orbit-angle-changed="${this._updateViewer}"
+          @dblclick="${this._updateOneViewSyncMode}"
+        >
         </viewer-3d>
-        <viewer-2d id="viewer2D" src2D=${this.src2D} 
-          .measurementTool ="${this._viewerSettings.measurementTool}"
-          .viewSettings ="${this.viewSettings}"
-          @image-zoom-changed ="${this._handleImageZoomChanged}"
-          @image-shifted ="${this._handleImageShifted}"
-          @min-zoom-level-changed ="${this._handleImageMinZoomLevelChanged}"
-          @double-press= "${this._updateOneViewSyncMode}"
-          @pointer-move-in-disable-mode =  "${this._handlePointerMoveOnImageInDisableMode}"
-          @double-press-completed = "${this._updateOneViewSyncMode}" >  
+        <viewer-2d
+          id="viewer2D"
+          src2D=${this.src2D}
+          .measurementTool="${this._viewerSettings.measurementTool}"
+          .viewSettings="${this.viewSettings}"
+          @image-zoom-changed="${this._handleImageZoomChanged}"
+          @image-shifted="${this._handleImageShifted}"
+          @min-zoom-level-changed="${this._handleImageMinZoomLevelChanged}"
+          @double-press="${this._updateOneViewSyncMode}"
+          @pointer-move-in-disable-mode="${this
+            ._handlePointerMoveOnImageInDisableMode}"
+          @double-press-completed="${this._updateOneViewSyncMode}"
+        >
         </viewer-2d>
-        <control-panel id="controls" ?isColumnMode=${this._isColumnDir}
-        .viewerSettings ="${this._viewerSettings}"
-         @view-mode-changed = "${this._handleViewModeChanged}">
+        <control-panel
+          id="controls"
+          ?isColumnMode=${this._isColumnDir}
+          .viewerSettings="${this._viewerSettings}"
+          @view-mode-changed="${this._handleViewModeChanged}"
+        >
         </control-panel>
       </div>
-    `
+    `;
   }
 
   connectedCallback() {
@@ -149,8 +195,7 @@ export class PhotogrammetryViewer extends LitElement {
   }
 
   updated(changedProperties: Map<string, unknown>) {
-
-    super.updated(changedProperties)
+    super.updated(changedProperties);
 
     if (changedProperties.has("srcScanInformation")) {
       this._isInit = false;
@@ -161,6 +206,12 @@ export class PhotogrammetryViewer extends LitElement {
       this._imageCamera.setIsYupTransformApplied(this.isYupTransformApplied);
     }
 
+    if (changedProperties.has("src2D") && this._defaultViewSettings) {
+      this.viewSettings = new DefaultPhotogrammetryViewerSettings(
+        this.src2D,
+        ".png"
+      );
+    }
   }
 
   private _handleViewModeChanged(event: CustomEvent) {
@@ -169,28 +220,28 @@ export class PhotogrammetryViewer extends LitElement {
     }
 
     const oldIdx = this._viewModeIndex;
-    this._viewModeIndex = event.detail.viewIndex
+    this._viewModeIndex = event.detail.viewIndex;
 
-    if (oldIdx == 0) //if old mode was one view sync -> seperate 2d and 3d viewer 
-    {
+    if (oldIdx == 0) {
+      //if old mode was one view sync -> seperate 2d and 3d viewer
       this._activateAndShow2DViewer();
       this._updateViewerSize();
     }
 
-    if (oldIdx == 2 || this._viewModeIndex == 2) //if old or new mode is navigation  mode -> change sync behaviour
-    {
+    if (oldIdx == 2 || this._viewModeIndex == 2) {
+      //if old or new mode is navigation  mode -> change sync behaviour
       this._changeSyncMode();
     }
 
-    if (this._viewModeIndex == 0) //if new mode is one view mode -> change viewer size
-    {
+    if (this._viewModeIndex == 0) {
+      //if new mode is one view mode -> change viewer size
       this._updateViewerSize();
     }
-
   }
 
   private _handlePointerMoveOnImageInDisableMode(event: CustomEvent) {
-    if (this._viewModeIndex > 0) { // no one view sync mode
+    if (this._viewModeIndex > 0) {
+      // no one view sync mode
       return;
     }
 
@@ -198,19 +249,20 @@ export class PhotogrammetryViewer extends LitElement {
   }
 
   private _handleScanInformationExtracted(): void {
-
-    this._imageCamera.init(this._scanInformation, this.isYupTransformApplied, this._viewerSettings.modelOrientation.eulerOrientationYXZInRad.angleInRad);
+    this._imageCamera.init(
+      this._scanInformation,
+      this.isYupTransformApplied,
+      this._viewerSettings.modelOrientation.eulerOrientationYXZInRad.angleInRad
+    );
     this.viewer2DElement.setImageFiles(this._scanInformation.imageFiles);
-
 
     if (this.viewer3DElement.loaded) {
       this._updateViewer();
     }
-
   }
 
   private _activateAndShow2DViewer() {
-    this.viewer2DElement.style.cursor = 'auto';
+    this.viewer2DElement.style.cursor = "auto";
     this.viewer2DElement.style.opacity = "1";
     this.viewer2DElement.style.zIndex = "2";
     this.viewer2DElement.updatePointerEventsState(false);
@@ -220,23 +272,20 @@ export class PhotogrammetryViewer extends LitElement {
     this.viewer2DElement.style.opacity = "0";
     this.viewer2DElement.style.zIndex = "0";
     this.viewer2DElement.updatePointerEventsState(true);
-    this.viewer2DElement.style.cursor = 'grabbing';
+    this.viewer2DElement.style.cursor = "grabbing";
   }
 
-
-
   private _updateOneViewSyncMode() {
-    if (this._viewModeIndex > 0) { // no one view mode active
+    if (this._viewModeIndex > 0) {
+      // no one view mode active
       return;
     }
 
     if (this.viewer2DElement.style.opacity === "0") {
       this._activateAndShow2DViewer();
-
     } else {
       this._deactivateAndHide2DViewer();
     }
-
   }
 
   private _handleViewerResizeEvent() {
@@ -244,68 +293,93 @@ export class PhotogrammetryViewer extends LitElement {
   }
 
   private _updateViewerSize() {
-    if (this._viewModeIndex == 0) //oneview sync mode
-    {
-      this._viewerAspectRatio = this.viewerBase.offsetWidth / this.viewerBase.offsetHeight; //has to be before resizing"
+    if (this._viewModeIndex == 0) {
+      //oneview sync mode
+      this._viewerAspectRatio =
+        this.viewerBase.offsetWidth / this.viewerBase.offsetHeight; //has to be before resizing"
 
-      this.viewer3DElement.resize(this.viewerBase.offsetHeight, this.viewerBase.offsetWidth); //first resize 3d and after resize 2d!
-      this.viewer2DElement.resize(this.viewerBase.offsetHeight, this.viewerBase.offsetWidth, 'translate(0,0)');
+      this.viewer3DElement.resize(
+        this.viewerBase.offsetHeight,
+        this.viewerBase.offsetWidth
+      ); //first resize 3d and after resize 2d!
+      this.viewer2DElement.resize(
+        this.viewerBase.offsetHeight,
+        this.viewerBase.offsetWidth,
+        "translate(0,0)"
+      );
 
-      if (this._syncSettings2DViewer == null || this._syncSettings3DViewer == null) {
+      if (
+        this._syncSettings2DViewer == null ||
+        this._syncSettings3DViewer == null
+      ) {
         return;
       }
 
-      const scaleFactor = this._syncSettings2DViewer.imageAspectRatio / this._viewerAspectRatio;
+      const scaleFactor =
+        this._syncSettings2DViewer.imageAspectRatio / this._viewerAspectRatio;
       const correctedFov = this._syncSettings3DViewer.fovInRad * scaleFactor;
-      this.viewer3DElement.setReferenceFieldOfView(correctedFov, this._viewModeIndex < 2);
+      this.viewer3DElement.setReferenceFieldOfView(
+        correctedFov,
+        this._viewModeIndex < 2
+      );
 
       this._synchronize3DViewer();
       return;
     }
 
-    this._isColumnDir = this.viewerBase.offsetHeight > this.viewerBase.offsetWidth; //
+    this._isColumnDir =
+      this.viewerBase.offsetHeight > this.viewerBase.offsetWidth; //
 
     if (this._syncSettings2DViewer != null) {
-      let filledRelArea = this._syncSettings2DViewer.imageAspectRatio * this.viewerBase.offsetHeight / this.viewerBase.offsetWidth;
+      let filledRelArea =
+        (this._syncSettings2DViewer.imageAspectRatio *
+          this.viewerBase.offsetHeight) /
+        this.viewerBase.offsetWidth;
       this._isColumnDir = filledRelArea > 1 ? true : false;
     }
 
     let newViewerWidth = this.viewerBase.offsetWidth;
     let newViewerHeight = this.viewerBase.offsetHeight * 0.5;
-    let viewerTranslateString = 'translate(0,100%)';
+    let viewerTranslateString = "translate(0,100%)";
 
     if (!this._isColumnDir) {
       newViewerWidth = this.viewerBase.offsetWidth * 0.5;
       newViewerHeight = this.viewerBase.offsetHeight;
-      viewerTranslateString = 'translate(100%,0)';
+      viewerTranslateString = "translate(100%,0)";
     }
 
     this._viewerAspectRatio = newViewerWidth / newViewerHeight; //has to be before resizing"
 
     this.viewer3DElement.resize(newViewerHeight, newViewerWidth); //first resize 3d and after resize 2d!
-    this.viewer2DElement.resize(newViewerHeight, newViewerWidth, viewerTranslateString);
+    this.viewer2DElement.resize(
+      newViewerHeight,
+      newViewerWidth,
+      viewerTranslateString
+    );
     this.requestUpdate();
 
-
-    if (this._syncSettings2DViewer == null || this._syncSettings3DViewer == null) {
+    if (
+      this._syncSettings2DViewer == null ||
+      this._syncSettings3DViewer == null
+    ) {
       return;
     }
 
-    const scaleFactor = this._syncSettings2DViewer.imageAspectRatio / this._viewerAspectRatio;
+    const scaleFactor =
+      this._syncSettings2DViewer.imageAspectRatio / this._viewerAspectRatio;
     const correctedFov = this._syncSettings3DViewer.fovInRad * scaleFactor;
     this.viewer3DElement.setReferenceFieldOfView(correctedFov, true);
     this._synchronize3DViewer();
   }
 
   private _changeSyncMode(): void {
-
-    if (this._viewModeIndex < 2) {  //sync mode is active
+    if (this._viewModeIndex < 2) {
+      //sync mode is active
 
       this.viewer3DElement.updateRadiusMode(true);
       this._synchronize3DViewer();
       this.viewer3DElement.disablePan = true;
-    }
-    else {
+    } else {
       this.viewer3DElement.disablePan = false;
       this.viewer3DElement.updateRadiusMode(false);
       this.viewer3DElement.setViewerOffset(0, 0);
@@ -313,7 +387,8 @@ export class PhotogrammetryViewer extends LitElement {
   }
 
   private _handleFovBasedZoomChanged(event: CustomEvent): void {
-    if (this._viewModeIndex == 2) { // no sync mode
+    if (this._viewModeIndex == 2) {
+      // no sync mode
       return;
     }
 
@@ -321,33 +396,38 @@ export class PhotogrammetryViewer extends LitElement {
   }
 
   private _handleImageZoomChanged(event: CustomEvent): void {
-
     if (this._viewModeIndex < 2) {
       this.viewer3DElement.zoomTo(event.detail.zoomLevel);
     }
   }
 
   private _handleImageMinZoomLevelChanged(event: CustomEvent): void {
-
     this.viewer3DElement.setMinZoomLevel(event.detail.zoomLevel);
   }
 
   private _handleImageShifted(event: CustomEvent): void {
     if (this._viewModeIndex < 2) {
-      this.viewer3DElement.setViewerOffset(event.detail.deltaX, event.detail.deltaY);
+      this.viewer3DElement.setViewerOffset(
+        event.detail.deltaX,
+        event.detail.deltaY
+      );
     }
   }
 
   private _updateViewer(): void {
-
     const cam3DViewer = this.viewer3DElement.getCamera();
-    [this._syncSettings2DViewer, this._syncSettings3DViewer] = this._imageCamera.getSyncSettingsOfNextBestImage(cam3DViewer);
+    [this._syncSettings2DViewer, this._syncSettings3DViewer] =
+      this._imageCamera.getSyncSettingsOfNextBestImage(cam3DViewer);
 
-    if (this._syncSettings2DViewer == null || this._syncSettings3DViewer == null) {
+    if (
+      this._syncSettings2DViewer == null ||
+      this._syncSettings3DViewer == null
+    ) {
       return;
     }
 
-    this._viewerSettings.imageRotation.autoRotationAngle = this._syncSettings2DViewer.rotationAngle;
+    this._viewerSettings.imageRotation.autoRotationAngle =
+      this._syncSettings2DViewer.rotationAngle;
 
     const currentImageIdx = this._syncSettings2DViewer.imageIdx;
     this.viewer2DElement.loadNextImage(currentImageIdx);
@@ -355,61 +435,68 @@ export class PhotogrammetryViewer extends LitElement {
     const currentSensor = this._imageCamera.getImageSensor(currentImageIdx);
     if (currentSensor == null) {
       console.log("There is no sensor to the image index ", currentImageIdx);
-    }
-    else {
+    } else {
       this._viewerSettings.measurementTool.imageSensor = currentSensor;
     }
 
-    this._viewerSettings.measurementTool.imageCamOrientation = this._imageCamera.getCameraPose(currentImageIdx);
+    this._viewerSettings.measurementTool.imageCamOrientation =
+      this._imageCamera.getCameraPose(currentImageIdx);
 
-    const scaleFactor = this._syncSettings2DViewer.imageAspectRatio / this._viewerAspectRatio;
+    const scaleFactor =
+      this._syncSettings2DViewer.imageAspectRatio / this._viewerAspectRatio;
     const correctedFov = this._syncSettings3DViewer.fovInRad * scaleFactor;
     if (!this._isInit) {
       this.viewer3DElement.setReferenceFieldOfView(correctedFov, true);
-      this.viewer3DElement.setCameraOrbitPos(this._syncSettings3DViewer.orbitPos);
+      this.viewer3DElement.setCameraOrbitPos(
+        this._syncSettings3DViewer.orbitPos
+      );
       this._updateViewerSize();
       this._isInit = true;
-    }
-    else {
-      this.viewer3DElement.setReferenceFieldOfView(correctedFov, this._viewModeIndex < 2);
+    } else {
+      this.viewer3DElement.setReferenceFieldOfView(
+        correctedFov,
+        this._viewModeIndex < 2
+      );
     }
 
     if (this._viewModeIndex < 2) {
       this._synchronize3DViewer();
     }
-
   }
 
   private _synchronize3DViewer(): void {
-    if (this._syncSettings3DViewer == null || this._syncSettings2DViewer == null) {
+    if (
+      this._syncSettings3DViewer == null ||
+      this._syncSettings2DViewer == null
+    ) {
       return;
     }
 
     this.viewer3DElement.setCameraOrbitPos(this._syncSettings3DViewer.orbitPos);
-    this.viewer3DElement.cameraTarget = this._syncSettings3DViewer.cameraTarget.toString();
+    this.viewer3DElement.cameraTarget =
+      this._syncSettings3DViewer.cameraTarget.toString();
     this.viewer3DElement.zoomTo(this.viewer2DElement.getZoomLevel());
-
   }
 
   static styles = css`
     :host {
       width: 100%;
       height: 100%;
-      display: flex; 
+      display: flex;
       justify-content: center;
-      align-items: center
+      align-items: center;
     }
 
     #viewerBase {
-        position: relative;
-        border: 2px solid blue;
-        width: 100%;
-        height: 100%;
-        min-height: 400px;
-        border: 0;
-        background-color: lightgray
+      position: relative;
+      border: 2px solid blue;
+      width: 100%;
+      height: 100%;
+      min-height: 400px;
+      border: 0;
+      background-color: lightgray;
     }
-    
+
     #viewer2D {
       position: absolute;
       left: 0;
@@ -421,7 +508,7 @@ export class PhotogrammetryViewer extends LitElement {
     #viewer3D {
       position: absolute;
       z-index: 1;
-      overflow: hidden
+      overflow: hidden;
     }
 
     #controls {
@@ -434,55 +521,54 @@ export class PhotogrammetryViewer extends LitElement {
       pointer-events: none;
     }
 
-    .hotspot{
-        display: block;
-        width: 20px;
-        height: 20px;
-        border-radius: 20px;
-        border: none;
-        background-color: #fff;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
-        box-sizing: border-box;
-        cursor: pointer;
-        transition: opacity 0.3s;
-        position: relative;
-        font-size: 12px;
-        padding: 0
+    .hotspot {
+      display: block;
+      width: 20px;
+      height: 20px;
+      border-radius: 20px;
+      border: none;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+      box-sizing: border-box;
+      cursor: pointer;
+      transition: opacity 0.3s;
+      position: relative;
+      font-size: 12px;
+      padding: 0;
     }
 
     .hotspot:not([data-visible]) {
-        background: transparent;
-        border: 3px solid #fff;
-        box-shadow: none;
-        pointer-events: none;
+      background: transparent;
+      border: 3px solid #fff;
+      box-shadow: none;
+      pointer-events: none;
     }
 
     .hotspot:focus {
-        border: 3px solid rgb(0, 128, 200);
-        outline: none;
-        padding: 0;
+      border: 3px solid rgb(0, 128, 200);
+      outline: none;
+      padding: 0;
     }
 
     .hotspot > * {
-        opacity: 1;
+      opacity: 1;
     }
 
-    .annotation{
-        background: rgba(0, 0, 0,0.75);
-        color: rgba(255, 255, 255);
-        border-radius: 5px;
-        border: 0;
-        box-shadow: 0;
-        width: max-content;
-        padding: 0.25em 0.5em
+    .annotation {
+      background: rgba(0, 0, 0, 0.75);
+      color: rgba(255, 255, 255);
+      border-radius: 5px;
+      border: 0;
+      box-shadow: 0;
+      width: max-content;
+      padding: 0.25em 0.5em;
     }
-
-  `
+  `;
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'photogrammetry-viewer': PhotogrammetryViewer
+    "photogrammetry-viewer": PhotogrammetryViewer;
   }
 }
 

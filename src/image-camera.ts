@@ -14,6 +14,8 @@ export class ImageCamera extends EventEmitter {
     poses: Array<Matrix4> = [];
     normedPositions: Array<Vector3> = [];
 
+    private _remapCoordinates: Vector3 = new Vector3(0, 1, 2);
+
     private _sensorMap = new Map<string, Sensor>();
     private _sensorIds: Array<string> = [];
 
@@ -50,6 +52,13 @@ export class ImageCamera extends EventEmitter {
         this.emit('camera-parameters-changed');
     }
 
+    setAxesRemapping(newMapping: Vector3) {
+        console.log("Set new axes mapping")
+        this._remapCoordinates = newMapping;
+        this._calculateCamPosesInWorldCoor();
+        this.emit('camera-parameters-changed');
+    }
+
     getImageSensor(imageIdx: number): Sensor | undefined{
         const sensorId = this._sensorIds[imageIdx];
         return this._sensorMap.get(sensorId);
@@ -65,9 +74,19 @@ export class ImageCamera extends EventEmitter {
     }
 
     getSyncSettingsOfNextBestImage(viewerCamera: Camera): [Settings2DViewer, Settings3DViewer] | [null, null] {
-
         const current3DCamPosition = viewerCamera.position;
         let normed3DCamPosition = current3DCamPosition.clone().normalize();
+        normed3DCamPosition = new Vector3(
+          normed3DCamPosition.getComponent(
+            this._remapCoordinates.getComponent(0)
+          ),
+          normed3DCamPosition.getComponent(
+            this._remapCoordinates.getComponent(1)
+          ),
+          normed3DCamPosition.getComponent(
+            this._remapCoordinates.getComponent(2)
+          )
+        );
 
         //1. get next best image idx
         let minAngle = Number.MAX_VALUE;

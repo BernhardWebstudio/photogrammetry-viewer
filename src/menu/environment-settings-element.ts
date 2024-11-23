@@ -3,6 +3,8 @@ import { customElement, property, query } from "lit/decorators.js";
 
 import "@ui5/webcomponents/dist/Title";
 import "@ui5/webcomponents/dist/Label";
+import "@ui5/webcomponents/dist/Select";
+import "@ui5/webcomponents/dist/Option";
 import "@ui5/webcomponents/dist/CheckBox";
 import "@ui5/webcomponents/dist/ColorPalette.js";
 import "@ui5/webcomponents/dist/ColorPalettePopover.js";
@@ -11,6 +13,7 @@ import "@ui5/webcomponents/dist/StepInput.js";
 
 import { EnvironmentSettings } from "../viewer-settings";
 import ColorPalettePopover from "@ui5/webcomponents/dist/ColorPalettePopover.js";
+import { Vector3 } from "three";
 
 @customElement("environment-settings")
 export class EnvironmentSettingsElement extends LitElement {
@@ -40,20 +43,31 @@ export class EnvironmentSettingsElement extends LitElement {
             @change="${this._handleShowAxesStateChanged}"
           ></ui5-checkbox>
         </div>
+        <div class="input-row">
+          <ui5-label show-colon>Remap 2D ⇔ 3D Axes</ui5-label>
+          <ui5-select @change="${this._handleAxesRemapChanged}">
+            <ui5-option selected>x-y-z</ui5-option>
+            <ui5-option>x-z-y</ui5-option>
+            <ui5-option>y-x-z</ui5-option>
+            <ui5-option>y-z-x</ui5-option>
+            <ui5-option>z-x-y</ui5-option>
+            <ui5-option>z-y-x</ui5-option>
+          </ui5-select>
+        </div>
         <div
           id="divider"
           class="${this.isColumnMode ? "ver-orientation" : "hor-orientation"}"
         ></div>
         <div>
           <div class="input-row">
-              <ui5-label show-colon for="color-palette-current"
-                >Background Color</ui5-label
-              >
-              <ui5-color-palette-item
-                value=${this.environmentSettings.backgroundColor[0]}
+            <ui5-label show-colon for="color-palette-current"
+              >Background Color</ui5-label
+            >
+            <ui5-color-palette-item
+              value=${this.environmentSettings.backgroundColor[0]}
               @click=${this._toggleColorPalette}
-                id="color-palette-current"
-              ></ui5-color-palette-item>
+              id="color-palette-current"
+            ></ui5-color-palette-item>
           </div>
           <ui5-color-palette-popover
             id="colorPalettePopover"
@@ -124,6 +138,22 @@ export class EnvironmentSettingsElement extends LitElement {
     this.environmentSettings.showAxes = (
       event.target as HTMLInputElement
     ).checked;
+  }
+
+  private _handleAxesRemapChanged(event: CustomEvent) {
+    const xyz = "xyz";
+    const newAxesSplit = (event.target as HTMLSelectElement).value.split("-");
+    console.log("Axes remap requested", newAxesSplit);
+    if (newAxesSplit.length == 3) {
+      const newAxes = newAxesSplit.map((axis) => xyz.indexOf(axis));
+      this.environmentSettings.remapAxes = new Vector3(
+        newAxes[0],
+        newAxes[1],
+        newAxes[2]
+      );
+    } else {
+      console.warn("Unexpected input", newAxesSplit);
+    }
   }
 
   private _handleApplyGradientStateChanged(event: CustomEvent) {

@@ -56,9 +56,13 @@
     "@types/node": "^22.9.0",
     "@types/openseadragon": "^3.0.10",
     "@types/three": "^0.169.0",
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "@typescript-eslint/parser": "^8.15.0",
+    "eslint": "^9.15.0",
+    "eslint-config-google": "^0.14.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
     "typescript": "^5.0.2",
     "vite": "^5.4.10",
-    "rollup-plugin-peer-deps-external": "^2.2.4",
     "vite-plugin-dts": "^4.3.0"
   }
 }
