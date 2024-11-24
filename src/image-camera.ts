@@ -144,6 +144,8 @@ export class ImageCamera extends EventEmitter {
     console.log("Computing sync settings of next best image", {
       rotAngle: rotAngle,
       idxMinAngle: idxMinAngle,
+      minAngle: minAngle,
+      normedPosition: this.normedPositions[idxMinAngle],
       unrotatedImgCamAxisX: unrotatedImgCamAxisX,
       normed3DCamPosition: normed3DCamPosition,
       projectedXDirCam2D: projectedXDirCam2D,
