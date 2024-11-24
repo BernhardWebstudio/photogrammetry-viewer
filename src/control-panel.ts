@@ -6,15 +6,15 @@ import {customElement, property} from 'lit/decorators.js';
 import {unsafeSVG} from 'lit/directives/unsafe-svg.js';
 import {registerIcon} from '@ui5/webcomponents-base/dist/asset-registries/Icons.js';
 import {TemplateFunction} from '@ui5/webcomponents-base/dist/renderer/executeTemplate.js';
-import doubleviewIcon from './assets/viewer_icon_doubleview.svg?raw';
-import doubleviewMobileIcon from './assets/viewer_icon_doubleview_mobile.svg?raw';
-import doubleviewSyncedIcon from './assets/viewer_icon_doubleview_synced.svg?raw';
-import doubleviewSyncedMobileIcon from './assets/viewer_icon_doubleview_synced_mobile.svg?raw';
-import singleViewIcon from './assets/viewer_icon_singleview.svg?raw';
-import singleViewMobileIcon from './assets/viewer_icon_singleview_mobile.svg?raw';
-import rotationIcon from './assets/rotation.svg?raw';
-import measurementIcon from './assets/measuring_v3.svg?raw';
-import environment3dIcon from './assets/3D_environment.svg?raw';
+import doubleviewIcon from './assets/viewer_icon_doubleview.svg';
+import doubleviewMobileIcon from './assets/viewer_icon_doubleview_mobile.svg';
+import doubleviewSyncedIcon from './assets/viewer_icon_doubleview_synced.svg';
+import doubleviewSyncedMobileIcon from './assets/viewer_icon_doubleview_synced_mobile.svg';
+import singleViewIcon from './assets/viewer_icon_singleview.svg';
+import singleViewMobileIcon from './assets/viewer_icon_singleview_mobile.svg';
+import rotationIcon from './assets/rotation.svg';
+import measurementIcon from './assets/measuring_v3.svg';
+import environment3dIcon from './assets/3D_environment.svg';
 
 import {ViewerSettings} from './viewer-settings';
 
