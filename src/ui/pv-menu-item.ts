@@ -1,26 +1,26 @@
-import Popover from "@ui5/webcomponents/dist/Popover.js";
+import Popover from '@ui5/webcomponents/dist/Popover.js';
 
-import "@ui5/webcomponents/dist/Button";
-import "@ui5/webcomponents/dist/Popover";
+import '@ui5/webcomponents/dist/Button';
+import '@ui5/webcomponents/dist/Popover';
 
-import { LitElement, css, html } from "lit";
-import { customElement, property, query } from "lit/decorators.js";
+import {LitElement, css, html} from 'lit';
+import {customElement, property, query} from 'lit/decorators.js';
 
-@customElement("pv-menu-item")
+@customElement('pv-menu-item')
 export class PVMenuItem extends LitElement {
   @property()
-  title: string = "";
+  title: string = '';
 
   @property()
-  icon: string = "";
+  icon: string = '';
 
   @property()
   idx: number = 0;
 
-  @query("#tool-popover")
+  @query('#tool-popover')
   toolPopover!: Popover;
 
-  @query("#tool-button")
+  @query('#tool-button')
   toolButton!: HTMLElement;
 
   render() {
@@ -41,13 +41,13 @@ export class PVMenuItem extends LitElement {
 
   _togglePopover() {
     if (this.toolPopover !== null) {
-      if (typeof this.toolPopover.opener == "undefined") {
+      if (typeof this.toolPopover.opener == 'undefined') {
         this.toolPopover.opener = this.toolButton;
       }
 
       this.toolPopover.open = !this.toolPopover.open;
     } else {
-      console.warn("Popover not found.");
+      console.warn('Popover not found.');
     }
   }
 

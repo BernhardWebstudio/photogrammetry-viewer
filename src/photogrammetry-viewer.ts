@@ -1,31 +1,31 @@
-import { LitElement, css, html } from "lit";
-import { customElement, property, query } from "lit/decorators.js";
+import {LitElement, css, html} from 'lit';
+import {customElement, property, query} from 'lit/decorators.js';
 
-import "./viewer-3d";
-import { ViewerElement3D } from "./viewer-3d";
+import './viewer-3d';
+import {ViewerElement3D} from './viewer-3d';
 
-import "./viewer-2d";
-import { ViewerElement2D } from "./viewer-2d";
+import './viewer-2d';
+import {ViewerElement2D} from './viewer-2d';
 
-import "./control-panel";
-import { ControlPanel } from "./control-panel";
+import './control-panel';
+import {ControlPanel} from './control-panel';
 
-import { ScanInformation } from "./scan-information";
-import { ImageCamera } from "./image-camera";
-import { Settings3DViewer, Settings2DViewer } from "./sync-settings";
+import {ScanInformation} from './scan-information';
+import {ImageCamera} from './image-camera';
+import {Settings3DViewer, Settings2DViewer} from './sync-settings';
 import {
   EnvironmentSettings,
   ImageRotationSettings,
   ModelOrientationSettings,
   ViewerSettings,
-} from "./viewer-settings";
-import { EulerYXZ } from "./eulerYXZ";
-import { MeasurementTool } from "./measurement-tool";
+} from './viewer-settings';
+import {EulerYXZ} from './eulerYXZ';
+import {MeasurementTool} from './measurement-tool';
 import {
   DefaultPhotogrammetryViewerSettings,
   PhotogrammetryViewerSettings,
-} from "./public-settings";
-import { Vector3 } from "three";
+} from './public-settings';
+import {Vector3} from 'three';
 
 /**
  * An example element.
@@ -33,40 +33,40 @@ import { Vector3 } from "three";
  * @slot - This element has a slot
  * @csspart button - The button
  */
-@customElement("photogrammetry-viewer")
+@customElement('photogrammetry-viewer')
 export class PhotogrammetryViewer extends LitElement {
-  //zup to yup applied
-  @property({ type: Boolean })
+  // zup to yup applied
+  @property({type: Boolean})
   isYupTransformApplied: boolean = false;
 
-  //src file names:
+  // src file names:
   @property()
-  src3D: string = ""; //'http://localhost:8000/3D/Yup.gltf';
+  src3D: string = ''; // 'http://localhost:8000/3D/Yup.gltf';
 
   @property()
-  src2D: string = ""; //'http://localhost:8000/edof/';
+  src2D: string = ''; // 'http://localhost:8000/edof/';
 
   @property()
-  srcScanInformation: string = ""; //'http://localhost:8000/Leptinotarsa_decemlineata_NOKI_metashape_cameras.xml';
+  srcScanInformation: string = ''; // 'http://localhost:8000/Leptinotarsa_decemlineata_NOKI_metashape_cameras.xml';
 
   // additional configuration
-  @property({ type: Object })
+  @property({type: Object})
   viewSettings!: PhotogrammetryViewerSettings;
 
   // Components:
-  @query("#viewerBase")
+  @query('#viewerBase')
   viewerBase!: HTMLDivElement;
 
-  @query("#viewer3D")
+  @query('#viewer3D')
   viewer3DElement!: ViewerElement3D;
 
-  @query("#viewer2D")
+  @query('#viewer2D')
   viewer2DElement!: ViewerElement2D;
 
-  @query("#controls")
+  @query('#controls')
   controlsElement!: ControlPanel;
 
-  //additional private classes:
+  // additional private classes:
   private _scanInformation: ScanInformation = new ScanInformation();
   private _imageCamera: ImageCamera = new ImageCamera();
 
@@ -75,7 +75,6 @@ export class PhotogrammetryViewer extends LitElement {
   private _viewerAspectRatio: number = 1;
 
   private _viewerSettings: ViewerSettings;
-  private _defaultViewSettings: boolean = false;
 
   private _viewModeIndex: number = 2;
 
@@ -96,36 +95,35 @@ export class PhotogrammetryViewer extends LitElement {
     };
 
     this._viewerSettings.modelOrientation.on(
-      "model-orientation-changed",
-      (newOrientation: EulerYXZ) =>
-        this._imageCamera.setAdditionalRotation(newOrientation)
+        'model-orientation-changed',
+        (newOrientation: EulerYXZ) =>
+          this._imageCamera.setAdditionalRotation(newOrientation),
     );
     this._viewerSettings.environment3D.on(
-      "change-axes-mapping-requested",
-      (newAxes: Vector3) => {
-        console.log("Setting new axes mapping");
-        this._imageCamera.setAxesRemapping(newAxes);
-      }
+        'change-axes-mapping-requested',
+        (newAxes: Vector3) => {
+          console.log('Setting new axes mapping');
+          this._imageCamera.setAxesRemapping(newAxes);
+        },
     );
 
     this._scanInformation.on(
-      "scanInformationExtracted",
-      this._handleScanInformationExtracted.bind(this)
+        'scanInformationExtracted',
+        this._handleScanInformationExtracted.bind(this),
     );
     this._imageCamera.on(
-      "camera-parameters-changed",
-      this._updateViewer.bind(this)
+        'camera-parameters-changed',
+        this._updateViewer.bind(this),
     );
     this._resizeObserver = new ResizeObserver(
-      this._handleViewerResizeEvent.bind(this)
+        this._handleViewerResizeEvent.bind(this),
     );
 
     if (this.viewSettings == null) {
       this.viewSettings = new DefaultPhotogrammetryViewerSettings(
-        this.src2D,
-        ".png"
+          this.src2D,
+          '.png',
       );
-      this._defaultViewSettings = true;
     }
   }
 
@@ -164,7 +162,7 @@ export class PhotogrammetryViewer extends LitElement {
           @min-zoom-level-changed="${this._handleImageMinZoomLevelChanged}"
           @double-press="${this._updateOneViewSyncMode}"
           @pointer-move-in-disable-mode="${this
-            ._handlePointerMoveOnImageInDisableMode}"
+      ._handlePointerMoveOnImageInDisableMode}"
           @double-press-completed="${this._updateOneViewSyncMode}"
         >
         </viewer-2d>
@@ -197,23 +195,19 @@ export class PhotogrammetryViewer extends LitElement {
   updated(changedProperties: Map<string, unknown>) {
     super.updated(changedProperties);
 
-    if (changedProperties.has("srcScanInformation")) {
+    if (changedProperties.has('srcScanInformation')) {
       this._isInit = false;
       this._scanInformation.readFromFile(this.srcScanInformation);
     }
 
-    if (changedProperties.has("isYupTransformApplied")) {
+    if (changedProperties.has('isYupTransformApplied')) {
       this._imageCamera.setIsYupTransformApplied(this.isYupTransformApplied);
     }
 
-    if (changedProperties.has("viewSettings")) {
-      this._defaultViewSettings = false;
-    }
-
-    if (changedProperties.has("src2D") && this._defaultViewSettings) {
+    if (changedProperties.has('src2D') && (this.viewSettings instanceof DefaultPhotogrammetryViewerSettings)) {
       this.viewSettings = new DefaultPhotogrammetryViewerSettings(
-        this.src2D,
-        ".png"
+          this.src2D,
+          '.png',
       );
     }
   }
@@ -227,18 +221,18 @@ export class PhotogrammetryViewer extends LitElement {
     this._viewModeIndex = event.detail.viewIndex;
 
     if (oldIdx == 0) {
-      //if old mode was one view sync -> seperate 2d and 3d viewer
+      // if old mode was one view sync -> seperate 2d and 3d viewer
       this._activateAndShow2DViewer();
       this._updateViewerSize();
     }
 
     if (oldIdx == 2 || this._viewModeIndex == 2) {
-      //if old or new mode is navigation  mode -> change sync behaviour
+      // if old or new mode is navigation  mode -> change sync behaviour
       this._changeSyncMode();
     }
 
     if (this._viewModeIndex == 0) {
-      //if new mode is one view mode -> change viewer size
+      // if new mode is one view mode -> change viewer size
       this._updateViewerSize();
     }
   }
@@ -254,9 +248,9 @@ export class PhotogrammetryViewer extends LitElement {
 
   private _handleScanInformationExtracted(): void {
     this._imageCamera.init(
-      this._scanInformation,
-      this.isYupTransformApplied,
-      this._viewerSettings.modelOrientation.eulerOrientationYXZInRad.angleInRad
+        this._scanInformation,
+        this.isYupTransformApplied,
+        this._viewerSettings.modelOrientation.eulerOrientationYXZInRad.angleInRad,
     );
     this.viewer2DElement.setImageFiles(this._scanInformation.imageFiles);
 
@@ -266,17 +260,17 @@ export class PhotogrammetryViewer extends LitElement {
   }
 
   private _activateAndShow2DViewer() {
-    this.viewer2DElement.style.cursor = "auto";
-    this.viewer2DElement.style.opacity = "1";
-    this.viewer2DElement.style.zIndex = "2";
+    this.viewer2DElement.style.cursor = 'auto';
+    this.viewer2DElement.style.opacity = '1';
+    this.viewer2DElement.style.zIndex = '2';
     this.viewer2DElement.updatePointerEventsState(false);
   }
 
   private _deactivateAndHide2DViewer() {
-    this.viewer2DElement.style.opacity = "0";
-    this.viewer2DElement.style.zIndex = "0";
+    this.viewer2DElement.style.opacity = '0';
+    this.viewer2DElement.style.zIndex = '0';
     this.viewer2DElement.updatePointerEventsState(true);
-    this.viewer2DElement.style.cursor = "grabbing";
+    this.viewer2DElement.style.cursor = 'grabbing';
   }
 
   private _updateOneViewSyncMode() {
@@ -285,7 +279,7 @@ export class PhotogrammetryViewer extends LitElement {
       return;
     }
 
-    if (this.viewer2DElement.style.opacity === "0") {
+    if (this.viewer2DElement.style.opacity === '0') {
       this._activateAndShow2DViewer();
     } else {
       this._deactivateAndHide2DViewer();
@@ -298,18 +292,18 @@ export class PhotogrammetryViewer extends LitElement {
 
   private _updateViewerSize() {
     if (this._viewModeIndex == 0) {
-      //oneview sync mode
+      // oneview sync mode
       this._viewerAspectRatio =
-        this.viewerBase.offsetWidth / this.viewerBase.offsetHeight; //has to be before resizing"
+        this.viewerBase.offsetWidth / this.viewerBase.offsetHeight; // has to be before resizing"
 
       this.viewer3DElement.resize(
-        this.viewerBase.offsetHeight,
-        this.viewerBase.offsetWidth
-      ); //first resize 3d and after resize 2d!
+          this.viewerBase.offsetHeight,
+          this.viewerBase.offsetWidth,
+      ); // first resize 3d and after resize 2d!
       this.viewer2DElement.resize(
-        this.viewerBase.offsetHeight,
-        this.viewerBase.offsetWidth,
-        "translate(0,0)"
+          this.viewerBase.offsetHeight,
+          this.viewerBase.offsetWidth,
+          'translate(0,0)',
       );
 
       if (
@@ -323,8 +317,8 @@ export class PhotogrammetryViewer extends LitElement {
         this._syncSettings2DViewer.imageAspectRatio / this._viewerAspectRatio;
       const correctedFov = this._syncSettings3DViewer.fovInRad * scaleFactor;
       this.viewer3DElement.setReferenceFieldOfView(
-        correctedFov,
-        this._viewModeIndex < 2
+          correctedFov,
+          this._viewModeIndex < 2,
       );
 
       this._synchronize3DViewer();
@@ -335,7 +329,7 @@ export class PhotogrammetryViewer extends LitElement {
       this.viewerBase.offsetHeight > this.viewerBase.offsetWidth; //
 
     if (this._syncSettings2DViewer != null) {
-      let filledRelArea =
+      const filledRelArea =
         (this._syncSettings2DViewer.imageAspectRatio *
           this.viewerBase.offsetHeight) /
         this.viewerBase.offsetWidth;
@@ -344,21 +338,21 @@ export class PhotogrammetryViewer extends LitElement {
 
     let newViewerWidth = this.viewerBase.offsetWidth;
     let newViewerHeight = this.viewerBase.offsetHeight * 0.5;
-    let viewerTranslateString = "translate(0,100%)";
+    let viewerTranslateString = 'translate(0,100%)';
 
     if (!this._isColumnDir) {
       newViewerWidth = this.viewerBase.offsetWidth * 0.5;
       newViewerHeight = this.viewerBase.offsetHeight;
-      viewerTranslateString = "translate(100%,0)";
+      viewerTranslateString = 'translate(100%,0)';
     }
 
-    this._viewerAspectRatio = newViewerWidth / newViewerHeight; //has to be before resizing"
+    this._viewerAspectRatio = newViewerWidth / newViewerHeight; // has to be before resizing"
 
-    this.viewer3DElement.resize(newViewerHeight, newViewerWidth); //first resize 3d and after resize 2d!
+    this.viewer3DElement.resize(newViewerHeight, newViewerWidth); // first resize 3d and after resize 2d!
     this.viewer2DElement.resize(
-      newViewerHeight,
-      newViewerWidth,
-      viewerTranslateString
+        newViewerHeight,
+        newViewerWidth,
+        viewerTranslateString,
     );
     this.requestUpdate();
 
@@ -378,7 +372,7 @@ export class PhotogrammetryViewer extends LitElement {
 
   private _changeSyncMode(): void {
     if (this._viewModeIndex < 2) {
-      //sync mode is active
+      // sync mode is active
 
       this.viewer3DElement.updateRadiusMode(true);
       this._synchronize3DViewer();
@@ -412,8 +406,8 @@ export class PhotogrammetryViewer extends LitElement {
   private _handleImageShifted(event: CustomEvent): void {
     if (this._viewModeIndex < 2) {
       this.viewer3DElement.setViewerOffset(
-        event.detail.deltaX,
-        event.detail.deltaY
+          event.detail.deltaX,
+          event.detail.deltaY,
       );
     }
   }
@@ -438,7 +432,7 @@ export class PhotogrammetryViewer extends LitElement {
 
     const currentSensor = this._imageCamera.getImageSensor(currentImageIdx);
     if (currentSensor == null) {
-      console.log("There is no sensor to the image index ", currentImageIdx);
+      console.log('There is no sensor to the image index ', currentImageIdx);
     } else {
       this._viewerSettings.measurementTool.imageSensor = currentSensor;
     }
@@ -452,14 +446,14 @@ export class PhotogrammetryViewer extends LitElement {
     if (!this._isInit) {
       this.viewer3DElement.setReferenceFieldOfView(correctedFov, true);
       this.viewer3DElement.setCameraOrbitPos(
-        this._syncSettings3DViewer.orbitPos
+          this._syncSettings3DViewer.orbitPos,
       );
       this._updateViewerSize();
       this._isInit = true;
     } else {
       this.viewer3DElement.setReferenceFieldOfView(
-        correctedFov,
-        this._viewModeIndex < 2
+          correctedFov,
+          this._viewModeIndex < 2,
       );
     }
 
@@ -572,7 +566,7 @@ export class PhotogrammetryViewer extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "photogrammetry-viewer": PhotogrammetryViewer;
+    'photogrammetry-viewer': PhotogrammetryViewer;
   }
 }
 

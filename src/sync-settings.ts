@@ -1,5 +1,5 @@
-import { SphericalPosition } from '@google/model-viewer/lib/features/controls';
-import { Vector3D } from '@google/model-viewer/lib/model-viewer-base';
+import {SphericalPosition} from '@google/model-viewer/lib/features/controls';
+import {Vector3D} from '@google/model-viewer/lib/model-viewer-base';
 
 export interface Settings2DViewer {
   imageIdx: number;

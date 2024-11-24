@@ -1,27 +1,26 @@
-import { LitElement, css, html } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import {LitElement, css, html} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 
-import "@ui5/webcomponents/dist/Icon.js";
-import "@ui5/webcomponents/dist/ToggleButton.js";
+import '@ui5/webcomponents/dist/Icon.js';
+import '@ui5/webcomponents/dist/ToggleButton.js';
 
-import "@ui5/webcomponents/dist/Popover";
+import '@ui5/webcomponents/dist/Popover';
 
 
 @customElement('pv-menu')
 export class PVMenu extends LitElement {
-
-  @property({ type: Boolean })
+  @property({type: Boolean})
   isColumnMode: boolean = false;
 
   render() {
     return html`
       <div
         id="toolBar"
-        class="${this.isColumnMode ? "ver-orientation" : "hor-orientation"}"
+        class="${this.isColumnMode ? 'ver-orientation' : 'hor-orientation'}"
       >
         <div
           id="btnBar"
-          class="${this.isColumnMode ? "hor-orientation" : "ver-orientation"}"
+          class="${this.isColumnMode ? 'hor-orientation' : 'ver-orientation'}"
         >
           <slot @slotchange=${this._handleSlotChange}></slot>
         </pv-tool-area>
@@ -30,7 +29,7 @@ export class PVMenu extends LitElement {
   }
 
   _handleSlotChange(e: CustomEvent) {
-    console.log("Slot changed", e);
+    console.log('Slot changed', e);
   }
 
   static styles = css`

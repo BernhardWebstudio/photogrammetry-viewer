@@ -1,38 +1,37 @@
-import { LitElement, css, html } from 'lit'
-import { customElement, property } from 'lit/decorators.js';
+import {LitElement, css, html} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 
 
-import "@ui5/webcomponents/dist/Title";
-import "@ui5/webcomponents/dist/Label";
-import "@ui5/webcomponents/dist/StepInput.js";
-import "@ui5/webcomponents/dist/CheckBox";
+import '@ui5/webcomponents/dist/Title';
+import '@ui5/webcomponents/dist/Label';
+import '@ui5/webcomponents/dist/StepInput.js';
+import '@ui5/webcomponents/dist/CheckBox';
 
-import { ImageRotationSettings , ModelOrientationSettings} from '../viewer-settings';
+import {ImageRotationSettings, ModelOrientationSettings} from '../viewer-settings';
 
 const clamp = (value: any, minValue: number, maxValue: number) => Math.min(Math.max(Number(value), minValue), maxValue);
 
 
 @customElement('rotation-settings')
 export class RotationSettingsElement extends LitElement {
-
-  @property({ type: Boolean })
+  @property({type: Boolean})
   isColumnMode: boolean = false;
 
-  @property({ type: Boolean })
+  @property({type: Boolean})
   isAutoRotationDisabled: boolean = false;
 
-  @property({ type: Object })
+  @property({type: Object})
   imageRotationSettings!: ImageRotationSettings;
 
-  @property({ type: Object })
+  @property({type: Object})
   modelOrientationSettings!: ModelOrientationSettings;
-  
+
   private _userAutoRotationOn: boolean = false;
 
 
   render() {
     return html`
-    <div id="layout" class="${this.isColumnMode ? "ver-orientation" : "hor-orientation"}">
+    <div id="layout" class="${this.isColumnMode ? 'ver-orientation' : 'hor-orientation'}">
       <div>    
         <ui5-title level="H5">3D</ui5-title>
         <div class = "input-row" >
@@ -48,13 +47,13 @@ export class RotationSettingsElement extends LitElement {
           <ui5-step-input id="zOrientation" value="0" min="0" max="359" step="10" @change="${this.handleZOrientationChanged}"></ui5-step-input>
         </div>
       </div>
-      <div id="divider" class="${this.isColumnMode ? "ver-orientation" : "hor-orientation"}"></div>
+      <div id="divider" class="${this.isColumnMode ? 'ver-orientation' : 'hor-orientation'}"></div>
       <div>    
         <ui5-title level="H5">2D</ui5-title>
         <div class = "input-row" >
           <ui5-label show-colon>Auto Rotation</ui5-label>
           <ui5-checkbox id= "autoRotationCheckbox" 
-             text="${this.imageRotationSettings.isAutoRotationActivated ? "On" : "Off"}"
+             text="${this.imageRotationSettings.isAutoRotationActivated ? 'On' : 'Off'}"
              ?checked="${this.imageRotationSettings.isAutoRotationActivated}" 
              ?disabled="${this.isAutoRotationDisabled}" 
              @change="${this._handleAutoRotationStateChanged}"></ui5-checkbox>
@@ -69,7 +68,7 @@ export class RotationSettingsElement extends LitElement {
         </div>
       </div>
     </div>
-        `
+        `;
   }
 
 
@@ -78,18 +77,16 @@ export class RotationSettingsElement extends LitElement {
   }
 
   updated(changedProperties: Map<string, unknown>) {
+    super.updated(changedProperties);
 
-    super.updated(changedProperties)
-
-    if (!changedProperties.has("isAutoRotationDisabled")) {
+    if (!changedProperties.has('isAutoRotationDisabled')) {
       return;
     }
 
     if (this.isAutoRotationDisabled) {
       this._userAutoRotationOn = this.imageRotationSettings.isAutoRotationActivated;
       this.imageRotationSettings.isAutoRotationActivated = true;
-    }
-    else {
+    } else {
       if (this.imageRotationSettings.isAutoRotationActivated != this._userAutoRotationOn) {
         this.imageRotationSettings.isAutoRotationActivated = this._userAutoRotationOn;
       }
@@ -105,7 +102,7 @@ export class RotationSettingsElement extends LitElement {
   }
 
   private _handleAutoRotationStateChanged(event: Event) {
-    const isAutoRotationActivated = (event.target as HTMLInputElement).checked
+    const isAutoRotationActivated = (event.target as HTMLInputElement).checked;
     if (this.imageRotationSettings.isAutoRotationActivated == isAutoRotationActivated) {
       return;
     }

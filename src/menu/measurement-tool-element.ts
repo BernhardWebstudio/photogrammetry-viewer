@@ -1,27 +1,27 @@
-import { css, html, LitElement } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import {css, html, LitElement} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 
-import "@ui5/webcomponents/dist/Button";
-import "@ui5/webcomponents/dist/Panel";
-import "@ui5/webcomponents/dist/Label";
-import "@ui5/webcomponents/dist/Title";
-import "@ui5/webcomponents/dist/List.js";
-import "@ui5/webcomponents/dist/ListItemStandard.js";
-import { MeasurementTool } from "../measurement-tool";
+import '@ui5/webcomponents/dist/Button';
+import '@ui5/webcomponents/dist/Panel';
+import '@ui5/webcomponents/dist/Label';
+import '@ui5/webcomponents/dist/Title';
+import '@ui5/webcomponents/dist/List.js';
+import '@ui5/webcomponents/dist/ListItemStandard.js';
+import {MeasurementTool} from '../measurement-tool';
 
-@customElement("measurement-tool")
+@customElement('measurement-tool')
 export class MeasurementToolElement extends LitElement {
-  @property({ type: Boolean })
+  @property({type: Boolean})
   isColumnMode: boolean = true;
 
-  @property({ type: Object })
+  @property({type: Object})
   measurementTool!: MeasurementTool;
 
   render() {
     return html`
       <div
         id="layout"
-        class="${this.isColumnMode ? "ver-orientation" : "hor-orientation"}"
+        class="${this.isColumnMode ? 'ver-orientation' : 'hor-orientation'}"
       >
         <div class="row">
           <div class="alignCenter">
@@ -35,7 +35,7 @@ export class MeasurementToolElement extends LitElement {
         <div class="row">
           <div class="alignCenter">
             <ui5-button @click="${this._handleNewPathClicked}">
-              ${this.measurementTool.numPoints > 0 ? "Reset" : "New"}
+              ${this.measurementTool.numPoints > 0 ? 'Reset' : 'New'}
             </ui5-button>
           </div>
           <div class="alignCenter">
@@ -44,7 +44,7 @@ export class MeasurementToolElement extends LitElement {
               this.measurementTool.numPoints == 0}"
               @click="${this._handleUpdateEditStateClicked}"
             >
-              ${this.measurementTool.isEditModeActive ? "Stop" : "Continue"}
+              ${this.measurementTool.isEditModeActive ? 'Stop' : 'Continue'}
             </ui5-button>
           </div>
         </div>
@@ -53,7 +53,7 @@ export class MeasurementToolElement extends LitElement {
   }
 
   firstUpdated(): void {
-    this.measurementTool.on("update-requested", () => this.requestUpdate());
+    this.measurementTool.on('update-requested', () => this.requestUpdate());
   }
 
   updated(changedProperties: Map<string, unknown>) {

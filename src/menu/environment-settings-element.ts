@@ -1,40 +1,40 @@
-import { LitElement, css, html } from "lit";
-import { customElement, property, query } from "lit/decorators.js";
+import {LitElement, css, html} from 'lit';
+import {customElement, property, query} from 'lit/decorators.js';
 
-import "@ui5/webcomponents/dist/Title";
-import "@ui5/webcomponents/dist/Label";
-import "@ui5/webcomponents/dist/Select";
-import "@ui5/webcomponents/dist/Option";
-import "@ui5/webcomponents/dist/CheckBox";
-import "@ui5/webcomponents/dist/ColorPalette.js";
-import "@ui5/webcomponents/dist/ColorPalettePopover.js";
-import "@ui5/webcomponents/dist/features/ColorPaletteMoreColors.js";
-import "@ui5/webcomponents/dist/StepInput.js";
+import '@ui5/webcomponents/dist/Title';
+import '@ui5/webcomponents/dist/Label';
+import '@ui5/webcomponents/dist/Select';
+import '@ui5/webcomponents/dist/Option';
+import '@ui5/webcomponents/dist/CheckBox';
+import '@ui5/webcomponents/dist/ColorPalette.js';
+import '@ui5/webcomponents/dist/ColorPalettePopover.js';
+import '@ui5/webcomponents/dist/features/ColorPaletteMoreColors.js';
+import '@ui5/webcomponents/dist/StepInput.js';
 
-import { EnvironmentSettings } from "../viewer-settings";
-import ColorPalettePopover from "@ui5/webcomponents/dist/ColorPalettePopover.js";
-import { Vector3 } from "three";
+import {EnvironmentSettings} from '../viewer-settings';
+import ColorPalettePopover from '@ui5/webcomponents/dist/ColorPalettePopover.js';
+import {Vector3} from 'three';
 
-@customElement("environment-settings")
+@customElement('environment-settings')
 export class EnvironmentSettingsElement extends LitElement {
-  @property({ type: Boolean })
+  @property({type: Boolean})
   isColumnMode: boolean = false;
 
-  @property({ type: Object })
+  @property({type: Object})
   environmentSettings!: EnvironmentSettings;
 
-  @query("#colorPalettePopover")
+  @query('#colorPalettePopover')
   colorPalettePopover!: ColorPalettePopover;
 
-  @query("#color-palette-current")
+  @query('#color-palette-current')
   colorPaletteToggle!: HTMLElement;
 
-  //TO DO: Brightness
+  // TO DO: Brightness
   render() {
     return html`
       <div
         id="layout"
-        class="${this.isColumnMode ? "ver-orientation" : "hor-orientation"}"
+        class="${this.isColumnMode ? 'ver-orientation' : 'hor-orientation'}"
       >
         <div class="input-row">
           <ui5-label show-colon>Show Axes</ui5-label>
@@ -56,7 +56,7 @@ export class EnvironmentSettingsElement extends LitElement {
         </div>
         <div
           id="divider"
-          class="${this.isColumnMode ? "ver-orientation" : "hor-orientation"}"
+          class="${this.isColumnMode ? 'ver-orientation' : 'hor-orientation'}"
         ></div>
         <div>
           <div class="input-row">
@@ -103,7 +103,7 @@ export class EnvironmentSettingsElement extends LitElement {
         </div>
         <div
           id="divider"
-          class="${this.isColumnMode ? "ver-orientation" : "hor-orientation"}"
+          class="${this.isColumnMode ? 'ver-orientation' : 'hor-orientation'}"
         ></div>
         <div class="input-row">
           <ui5-label show-colon>Light [%]</ui5-label>
@@ -121,7 +121,7 @@ export class EnvironmentSettingsElement extends LitElement {
 
   private _toggleColorPalette() {
     if (this.colorPalettePopover !== null) {
-      if (typeof this.colorPalettePopover.opener == "undefined") {
+      if (typeof this.colorPalettePopover.opener == 'undefined') {
         this.colorPalettePopover.opener = this.colorPaletteToggle;
       }
 
@@ -141,18 +141,18 @@ export class EnvironmentSettingsElement extends LitElement {
   }
 
   private _handleAxesRemapChanged(event: CustomEvent) {
-    const xyz = "xyz";
-    const newAxesSplit = (event.target as HTMLSelectElement).value.split("-");
-    console.log("Axes remap requested", newAxesSplit);
+    const xyz = 'xyz';
+    const newAxesSplit = (event.target as HTMLSelectElement).value.split('-');
+    console.log('Axes remap requested', newAxesSplit);
     if (newAxesSplit.length == 3) {
       const newAxes = newAxesSplit.map((axis) => xyz.indexOf(axis));
       this.environmentSettings.remapAxes = new Vector3(
-        newAxes[0],
-        newAxes[1],
-        newAxes[2]
+          newAxes[0],
+          newAxes[1],
+          newAxes[2],
       );
     } else {
-      console.warn("Unexpected input", newAxesSplit);
+      console.warn('Unexpected input', newAxesSplit);
     }
   }
 
