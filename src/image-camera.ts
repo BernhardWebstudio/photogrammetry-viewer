@@ -146,11 +146,13 @@ export class ImageCamera extends EventEmitter {
       idxMinAngle: idxMinAngle,
       minAngle: minAngle,
       normedPosition: this.normedPositions[idxMinAngle],
+      pose: this.poses[idxMinAngle],
       unrotatedImgCamAxisX: unrotatedImgCamAxisX,
       normed3DCamPosition: normed3DCamPosition,
       projectedXDirCam2D: projectedXDirCam2D,
       phiImageCam: phiImageCam,
       thetaImageCam: thetaImageCam,
+      nNormedPositions: this.normedPositions.length,
     });
 
     // set new image cam position
@@ -238,5 +240,10 @@ export class ImageCamera extends EventEmitter {
 
       this.normedPositions[i] = camPosition.normalize();
     }
+
+    console.log("Calculated camera poses in world coordinates", [
+        this.normedPositions,
+        this.poses
+    ]);
   }
 }
