@@ -246,6 +246,17 @@ export class ScanInformation extends EventEmitter {
     this.transformationChunkToWorld.setFromMatrix3(rotationChunkAsMat);
     this.transformationChunkToWorld.setPosition(translationChunkAsVector);
 
+    console.log("Transformation chunk to world extracted from XML", {
+      rotationChunkAsMat: rotationChunkAsMat,
+      rotationChunkAsStringArray: rotationChunkAsStringArray,
+      rotationElement: rotationElement,
+      scaleElement: scaleElement,
+      scaleFactor: scaleFactor,
+      transformationChunkToWorld: this.transformationChunkToWorld,
+      translationChunkAsStringArray: translationChunkAsStringArray,
+      translationElement: translationElement,
+    });
+
     return true;
   }
 
