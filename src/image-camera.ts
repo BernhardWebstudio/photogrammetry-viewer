@@ -241,9 +241,11 @@ export class ImageCamera extends EventEmitter {
       this.normedPositions[i] = camPosition.normalize();
     }
 
-    console.log("Calculated camera poses in world coordinates", [
-        this.normedPositions,
-        this.poses
-    ]);
+    console.log("Calculated camera poses in world coordinates", {
+      transformationChunkToWorldYUp: transformationChunkToWorldYUp,
+      camPosesInChunk: this._camPosesInChunk,
+      normedPoses: this.normedPositions,
+      poses: this.poses,
+    });
   }
 }
