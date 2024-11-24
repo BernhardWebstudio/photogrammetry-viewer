@@ -206,6 +206,10 @@ export class PhotogrammetryViewer extends LitElement {
       this._imageCamera.setIsYupTransformApplied(this.isYupTransformApplied);
     }
 
+    if (changedProperties.has("viewSettings")) {
+      this._defaultViewSettings = false;
+    }
+
     if (changedProperties.has("src2D") && this._defaultViewSettings) {
       this.viewSettings = new DefaultPhotogrammetryViewerSettings(
         this.src2D,
