@@ -140,6 +140,18 @@ export class ImageCamera extends EventEmitter {
       radToDeg(Math.atan2(projectedXDirCam2D.y, projectedXDirCam2D.x))
     );
 
+    // output debug info
+    console.log("Computing sync settings of next best image", {
+      rotAngle: rotAngle,
+      idxMinAngle: idxMinAngle,
+      unrotatedImgCamAxisX: unrotatedImgCamAxisX,
+      normed3DCamPosition: normed3DCamPosition,
+      projectedXDirCam2D: projectedXDirCam2D,
+      phiImageCam: phiImageCam,
+      thetaImageCam: thetaImageCam,
+    });
+
+    // set new image cam position
     const imageCamPos = new Vector3();
     imageCamPos.setFromMatrixPosition(this.poses[idxMinAngle]);
     const radius = imageCamPos.length();
