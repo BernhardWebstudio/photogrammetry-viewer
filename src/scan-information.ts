@@ -12,37 +12,32 @@ export class ScanInformation extends EventEmitter {
   camPosesInChunk: Array<Matrix4> = [];
   transformationChunkToWorld: Matrix4 = new Matrix4();
 
-  private _xhttp: XMLHttpRequest = new XMLHttpRequest();
   private _xmlDoc: Document | null = null;
 
   constructor() {
     super();
-    this._xhttp.onload = this._extractInformation.bind(this);
   }
 
   readFromFile(filename: string) {
-    this._xhttp.open("GET", filename, true); // true = async!;
-    this._xhttp.send();
+    fetch(filename)
+      .then((response) => response.text())
+      .then((text) => {
+        this._xmlDoc = new DOMParser().parseFromString(text, "text/xml");
+        this._extractInformation();
+      });
   }
 
   private _extractInformation(): void {
     this.isValid = false;
 
-    if (this._xhttp.status != 200) {
-      console.log("Coudn't read xml file");
-      return;
-    }
-
-    this._xmlDoc = this._xhttp.responseXML;
-
     if (this._xmlDoc == null) {
-      console.log("Xml of scaninformation is not valid");
+      console.error("Xml of scaninformation is not valid");
       return;
     }
 
     // 1. extract intrinsic camera params
     if (!this._extractIntrinsicCameraInformation()) {
-      console.log(
+      console.error(
         "Coudn't extract intrinsic camera information from xml document"
       );
       return;
@@ -50,7 +45,7 @@ export class ScanInformation extends EventEmitter {
 
     // 2. extract extrinsic camera params
     if (!this._extractExtrinsicCameraInformation()) {
-      console.log(
+      console.error(
         "Coudn't extract extrinisc camera information from xml document"
       );
       return;
@@ -156,11 +151,13 @@ export class ScanInformation extends EventEmitter {
 
   private _extractChunkToWorldCoorTransformation(): boolean {
     if (this._xmlDoc == null) {
+      console.error("XML Document is null");
       return false;
     }
 
     const transformElement = getLastElementOfTagName(this._xmlDoc, "transform");
     if (transformElement == null) {
+      console.error("XML Document doesn't contain a transform element");
       return false;
     }
 
