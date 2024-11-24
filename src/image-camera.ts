@@ -1,11 +1,12 @@
-import {Vector3, Matrix4, Quaternion, Camera, Vector2, Euler} from 'three';
-import {ScanInformation} from './scan-information';
-import {Settings2DViewer, Settings3DViewer} from './sync-settings';
-import {SphericalPosition} from '@google/model-viewer/lib/features/controls';
-import {Sensor} from './sensor';
-import {toVector3D} from '@google/model-viewer/lib/model-viewer-base';
-import {EventEmitter} from 'events';
-import {EulerYXZ} from './eulerYXZ';
+import { Vector3, Matrix4, Quaternion, Camera, Vector2, Euler } from "three";
+import { ScanInformation } from "./scan-information";
+import { Settings2DViewer, Settings3DViewer } from "./sync-settings";
+import { SphericalPosition } from "@google/model-viewer/lib/features/controls";
+import { Sensor } from "./sensor";
+import { toVector3D } from "@google/model-viewer/lib/model-viewer-base";
+import { EventEmitter } from "events";
+import { EulerYXZ } from "./eulerYXZ";
+import { normalizeDeg, radToDeg } from "./angle-math-utils";
 
 export class ImageCamera extends EventEmitter {
   // extrinsic:
@@ -23,9 +24,9 @@ export class ImageCamera extends EventEmitter {
   private _additionalRotation: Matrix4 = new Matrix4();
 
   init(
-      scanInformation: ScanInformation,
-      isYupTransformApplied: boolean,
-      additionalRotation: Euler,
+    scanInformation: ScanInformation,
+    isYupTransformApplied: boolean,
+    additionalRotation: Euler
   ) {
     this._sensorMap = scanInformation.sensorMap;
     this._sensorIds = scanInformation.sensorIds;
@@ -44,23 +45,23 @@ export class ImageCamera extends EventEmitter {
     }
     this._isYupTransformApplied = isYupTransformApplied;
     this._calculateCamPosesInWorldCoor();
-    this.emit('camera-parameters-changed');
+    this.emit("camera-parameters-changed");
   }
 
   setAdditionalRotation(additionalRotation: EulerYXZ): void {
-    console.log('Set additional rotation');
+    console.log("Set additional rotation");
     this._additionalRotation = this._additionalRotation.makeRotationFromEuler(
-        additionalRotation.angleInRad,
+      additionalRotation.angleInRad
     );
     this._calculateCamPosesInWorldCoor();
-    this.emit('camera-parameters-changed');
+    this.emit("camera-parameters-changed");
   }
 
   setAxesRemapping(newMapping: Vector3) {
-    console.log('Set new axes mapping');
+    console.log("Set new axes mapping");
     this._remapCoordinates = newMapping;
     this._calculateCamPosesInWorldCoor();
-    this.emit('camera-parameters-changed');
+    this.emit("camera-parameters-changed");
   }
 
   getImageSensor(imageIdx: number): Sensor | undefined {
@@ -77,14 +78,14 @@ export class ImageCamera extends EventEmitter {
   }
 
   getSyncSettingsOfNextBestImage(
-      viewerCamera: Camera,
+    viewerCamera: Camera
   ): [Settings2DViewer, Settings3DViewer] | [null, null] {
     const current3DCamPosition = viewerCamera.position;
     let normed3DCamPosition = current3DCamPosition.clone().normalize();
     normed3DCamPosition = new Vector3(
-        normed3DCamPosition.getComponent(this._remapCoordinates.getComponent(0)),
-        normed3DCamPosition.getComponent(this._remapCoordinates.getComponent(1)),
-        normed3DCamPosition.getComponent(this._remapCoordinates.getComponent(2)),
+      normed3DCamPosition.getComponent(this._remapCoordinates.getComponent(0)),
+      normed3DCamPosition.getComponent(this._remapCoordinates.getComponent(1)),
+      normed3DCamPosition.getComponent(this._remapCoordinates.getComponent(2))
     );
 
     // get next best image idx
@@ -107,9 +108,9 @@ export class ImageCamera extends EventEmitter {
     const yDirImageCam = new Vector3();
     const zDirImageCam = new Vector3();
     this.poses[idxMinAngle].extractBasis(
-        xDirImageCam,
-        yDirImageCam,
-        zDirImageCam,
+      xDirImageCam,
+      yDirImageCam,
+      zDirImageCam
     );
 
     // extract image pose of next best image
@@ -118,14 +119,14 @@ export class ImageCamera extends EventEmitter {
 
     // calculate ideal spherical x and y axis:
     const unrotatedImgCamAxisX = new Vector3(
-        Math.cos(thetaImageCam),
-        0,
-        -Math.sin(thetaImageCam),
+      Math.cos(thetaImageCam),
+      0,
+      -Math.sin(thetaImageCam)
     );
     const unrotatedImgCamAxisY = new Vector3(
-        -Math.cos(phiImageCam) * Math.sin(thetaImageCam),
-        Math.sin(phiImageCam),
-        -Math.cos(phiImageCam) * Math.cos(thetaImageCam),
+      -Math.cos(phiImageCam) * Math.sin(thetaImageCam),
+      Math.sin(phiImageCam),
+      -Math.cos(phiImageCam) * Math.cos(thetaImageCam)
     );
 
     // project x camera axis to ideal rotated x and y axis
@@ -135,8 +136,9 @@ export class ImageCamera extends EventEmitter {
     projectedXDirCam2D.normalize();
 
     // calculate rotation angle:
-    const rotAngle =
-      (Math.atan2(projectedXDirCam2D.y, projectedXDirCam2D.x) * 180) / Math.PI;
+    const rotAngle = normalizeDeg(
+      radToDeg(Math.atan2(projectedXDirCam2D.y, projectedXDirCam2D.x))
+    );
 
     const imageCamPos = new Vector3();
     imageCamPos.setFromMatrixPosition(this.poses[idxMinAngle]);
@@ -202,8 +204,8 @@ export class ImageCamera extends EventEmitter {
     for (let i = 0; i < this._camPosesInChunk.length; i++) {
       const camPoseInWorldScaled = new Matrix4();
       camPoseInWorldScaled.multiplyMatrices(
-          transformationChunkToWorldYUp,
-          this._camPosesInChunk[i],
+        transformationChunkToWorldYUp,
+        this._camPosesInChunk[i]
       );
 
       camPoseInWorldScaled.premultiply(this._additionalRotation);
