@@ -218,6 +218,13 @@ export class ImageCamera extends EventEmitter {
     this.normedPositions.length = this._camPosesInChunk.length;
 
     for (let i = 0; i < this._camPosesInChunk.length; i++) {
+      if (
+        this._camPosesInChunk[i] == null ||
+        typeof this._camPosesInChunk[i] === "undefined"
+      ) {
+        continue;
+      }
+
       const camPoseInWorldScaled = new Matrix4();
       camPoseInWorldScaled.multiplyMatrices(
         transformationChunkToWorldYUp,
