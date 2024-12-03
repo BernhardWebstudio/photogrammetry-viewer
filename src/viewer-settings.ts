@@ -106,7 +106,7 @@ export class ImageRotationSettings extends EventEmitter {
 }
 
 export class EnvironmentSettings extends EventEmitter {
-    private _showAxes: boolean = true;
+    private _showAxes: boolean = false;
     private _remapAxes: Vector3 = new Vector3(0, 1, 2);
 
     private _backgroundColor: string = '#444444'
