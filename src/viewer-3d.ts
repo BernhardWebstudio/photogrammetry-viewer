@@ -555,6 +555,9 @@ export class ViewerElement3D extends ModelViewerElement {
             0.25,
         ),
     );
+    this._coordinateAxes.forEach((axis) => {
+      axis.visible = false; // default from EnvironmentSettings
+    });
 
     const scalingVec = new Vector3(0.5, 0.5, 0.5);
     const transformMat = new Matrix4();
