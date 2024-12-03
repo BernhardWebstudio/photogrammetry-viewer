@@ -198,6 +198,10 @@ export class PhotogrammetryViewer extends LitElement {
     if (changedProperties.has('srcScanInformation')) {
       this._isInit = false;
       this._scanInformation.readFromFile(this.srcScanInformation);
+
+      if (!this._scanInformation.isValid) {
+        alert('Invalid scan information file');
+      }
     }
 
     if (changedProperties.has('isYupTransformApplied')) {
