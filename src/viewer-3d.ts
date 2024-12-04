@@ -605,6 +605,10 @@ export class ViewerElement3D extends ModelViewerElement {
     negZAxisLabel.position.z = -axesLength;
     this._coordinateLabel.push(negZAxisLabel);
 
+    this._coordinateLabel.forEach((axis) => {
+      axis.visible = false; // default from EnvironmentSettings
+    });
+
     this._addCoordinateElements();
 
     this._lastSphericalPosition = this.getCameraOrbit();
