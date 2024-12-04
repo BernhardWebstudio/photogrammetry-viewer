@@ -197,18 +197,21 @@ export class PhotogrammetryViewer extends LitElement {
 
     if (changedProperties.has('srcScanInformation')) {
       this._isInit = false;
-      this._scanInformation.readFromFile(this.srcScanInformation);
-
-      if (!this._scanInformation.isValid) {
-        alert('Invalid scan information file');
-      }
+      this._scanInformation.readFromFile(this.srcScanInformation).then(() => {
+        if (!this._scanInformation.isValid) {
+          alert('Invalid scan information file');
+        }
+      });
     }
 
     if (changedProperties.has('isYupTransformApplied')) {
       this._imageCamera.setIsYupTransformApplied(this.isYupTransformApplied);
     }
 
-    if (changedProperties.has('src2D') && (this.viewSettings instanceof DefaultPhotogrammetryViewerSettings)) {
+    if (
+      changedProperties.has('src2D') &&
+      this.viewSettings instanceof DefaultPhotogrammetryViewerSettings
+    ) {
       this.viewSettings = new DefaultPhotogrammetryViewerSettings(
           this.src2D,
           '.png',

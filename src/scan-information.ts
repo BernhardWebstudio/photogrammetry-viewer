@@ -19,7 +19,7 @@ export class ScanInformation extends EventEmitter {
   }
 
   readFromFile(filename: string) {
-    fetch(filename)
+    return fetch(filename)
         .then((response) => response.text())
         .then((text) => {
           this._xmlDoc = new DOMParser().parseFromString(text, 'text/xml');
