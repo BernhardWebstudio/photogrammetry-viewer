@@ -1,4 +1,4 @@
-import {css, html, LitElement} from 'lit';
+import {css, html, LitElement, nothing} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 
 import '@ui5/webcomponents/dist/Button';
@@ -25,15 +25,6 @@ export class MeasurementToolElement extends LitElement {
       >
         <div class="row">
           <div class="alignCenter">
-            <ui5-label level="H1">&Sigma;:</ui5-label>
-            <ui5-label>
-              ${this.measurementTool.measuredLength.toFixed(1)}
-            </ui5-label>
-            <ui5-label> mm</ui5-label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="alignCenter">
             <ui5-button @click="${this._handleNewPathClicked}">
               ${this.measurementTool.numPoints > 0 ? 'Reset' : 'New'}
             </ui5-button>
@@ -47,7 +38,33 @@ export class MeasurementToolElement extends LitElement {
               ${this.measurementTool.isEditModeActive ? 'Stop' : 'Continue'}
             </ui5-button>
           </div>
+          <div class="alignCenter">
+            <ui5-button
+              ?disabled="${this.measurementTool.isEditModeActive || this.measurementTool.numPoints == 0}"
+              @click="${() => { this.measurementTool.downloadPoints() }}"
+            >Download</ui5-button>
+          </div>
         </div>
+        ${this.measurementTool.numPoints === 0 ? nothing : html `
+        <table>
+          <thead>
+            <tr><th>#</th><th>x</th><th>y</th><th>z</th><th>distance</th><th>label</th></tr>
+          </thead>
+          <tbody>
+          ${this.measurementTool.measurementPoints.map((point, index) => html`
+            <tr>
+              <td>${index}</td>
+              <td>${point.positionInModelCoor.x}</td>
+              <td>${point.positionInModelCoor.y}</td>
+              <td>${point.positionInModelCoor.z}</td>
+              <td>${index > 0 ? this.measurementTool.measurementDistances[index - 1].distance : ''}</td>
+              <td><input .value="${point.label}" @change="${(ev: InputEvent) => { point.label = (ev.target as HTMLInputElement).value }}"></td>
+            </tr>
+          `)}
+            <tr><td colspan="4"></td><td>&Sigma;: ${this.measurementTool.measuredLength}</td><td></td></tr>
+          </tbody>
+        </table>
+        `}
       </div>
     `;
   }

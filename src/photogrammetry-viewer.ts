@@ -141,7 +141,6 @@ export class PhotogrammetryViewer extends LitElement {
           camera-target="0m 0m 0m"
           exposure="1.2"
           shadow-intensity="0"
-          alt="Leptinotarsa"
           min-field-of-view="0deg"
           max-field-of-view="18deg"
           interaction-prompt="none"

@@ -53,6 +53,14 @@ export class MeasurementTool extends EventEmitter {
       return this._measurementPoints.length;
     }
 
+    get measurementPoints(): MeasurementPoint[] {
+      return this._measurementPoints
+    }
+
+    get measurementDistances() :MeasurementDistance[] {
+      return this._measurementDistances
+    }
+
     get measuredLength(): number {
       return this._measuredLength;
     }
@@ -182,6 +190,18 @@ export class MeasurementTool extends EventEmitter {
       });
 
       this.emit('scene-update-requested');
+    }
+
+    downloadPoints() {
+      let csv = 'index,x,y,z,distance,label\n'
+      this._measurementPoints.forEach((point, index) => {
+        const coords = point.positionInModelCoor
+        csv += `${index},${coords.x},${coords.y},${coords.z},${index > 0 ? this._measurementDistances[index - 1].distance : ''},"${point.label.replace(/"/g, '""')}"\n`
+      })
+      const link = document.createElement('a')
+      link.href = window.URL.createObjectURL(new Blob([csv], { type: "text/csv" }))
+      link.download = 'measurement.csv'
+      link.click()
     }
 
     private _updateHotspotInImage(hotspotPosition: Vector3) {
@@ -460,6 +480,8 @@ export class SceneHotspotElement extends EventEmitter {
 }
 
 export class MeasurementPoint extends SceneHotspotElement {
+  label = ''
+
   constructor(index: number, position: Vector3, normal: Vector3, sceneOrientation: Euler) {
     super(position, normal, sceneOrientation);
 
