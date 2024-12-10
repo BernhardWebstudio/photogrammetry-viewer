@@ -1,24 +1,23 @@
-import { EventEmitter } from "events";
+import {EventEmitter} from 'events';
 
 export const debounce = (func: Function, delay = 250) => {
   let timeoutId: ReturnType<typeof setTimeout>;
-  return function (this: any, ...args: any[]) {
+  return function(this: any, ...args: any[]) {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func.apply(this, args), delay);
   };
 };
 
 
-
 export function doubleEventHandler(callback: (...args: any[]) => void, delay: number = 300): () => void {
   let numEventCalls = 0;
   let timeoutId: number;
 
-  return function (...args: any[]) {
+  return function(...args: any[]) {
     numEventCalls++;
 
     if (numEventCalls === 1) {
-      //single event call
+      // single event call
       timeoutId = window.setTimeout(() => {
         numEventCalls = 0;
       }, delay);
@@ -33,7 +32,6 @@ export function doubleEventHandler(callback: (...args: any[]) => void, delay: nu
 
 
 export class SingleClickEventHandler extends EventEmitter {
-
   private _isHoldEvent: boolean = false;
 
   private _holdTimeoutId: number = -1;
@@ -51,7 +49,7 @@ export class SingleClickEventHandler extends EventEmitter {
   }
 
   private _handleMouseDown() {
-    //reset  event settings:
+    // reset  event settings:
     this._isHoldEvent = false;
     window.clearTimeout(this._doubleClickTimeoutId);
 
@@ -61,9 +59,8 @@ export class SingleClickEventHandler extends EventEmitter {
     }, this._delay);
   }
 
-  
-  private _handleMouseClick(event: any) {
 
+  private _handleMouseClick(event: any) {
     if (this._isHoldEvent) {
       this._numClick = 0;
       this._isHoldEvent = false;
@@ -71,11 +68,11 @@ export class SingleClickEventHandler extends EventEmitter {
     }
 
     window.clearTimeout(this._holdTimeoutId);
-    
+
     this._numClick++;
 
     if (this._numClick === 1) {
-      //single click event call
+      // single click event call
       this._doubleClickTimeoutId = window.setTimeout(() => {
         this._numClick = 0;
         this.emit('single-click', event);
@@ -86,6 +83,5 @@ export class SingleClickEventHandler extends EventEmitter {
       this.emit('double-click', event);
     }
   }
-
 }
 

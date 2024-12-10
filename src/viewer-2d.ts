@@ -1,10 +1,19 @@
-import { LitElement, css, html } from 'lit'
-import { customElement, property, query } from 'lit/decorators.js';
-import OpenSeadragon, { CanvasPressEvent, TileEvent, ZoomEvent } from "openseadragon";
-import { SingleClickEventHandler, debounce, doubleEventHandler } from './helper';
+import {LitElement, css, html} from 'lit';
+import {customElement, property, query} from 'lit/decorators.js';
+import OpenSeadragon, {
+  CanvasPressEvent,
+  TileEvent,
+  ZoomEvent,
+} from 'openseadragon';
+import {
+  SingleClickEventHandler,
+  debounce,
+  doubleEventHandler,
+} from './helper';
 
-import { ViewerSettings } from './viewer-settings'
-import { MeasurementTool } from './measurement-tool';
+import {ViewerSettings} from './viewer-settings';
+import {MeasurementTool} from './measurement-tool';
+import {PhotogrammetryViewerSettings} from './public-settings';
 
 interface Pointer {
   clientX: number;
@@ -14,21 +23,20 @@ interface Pointer {
 
 @customElement('viewer-2d')
 export class ViewerElement2D extends LitElement {
-
   @property()
   src2D: string = '';
 
-  @property()
-  imageType: string = '.png';
-
   @query('#image_viewer')
-  parentElement!: HTMLDivElement; 
+  parentElement!: HTMLDivElement;
 
   @query('#overlay')
   hotspotOverlay!: HTMLDivElement;
 
-  @property({ type: Object })
+  @property({type: Object})
   measurementTool!: MeasurementTool;
+
+  @property({type: Object})
+  viewSettings!: PhotogrammetryViewerSettings;
 
   private _imageFiles: Array<string> = [];
   private _currentImageIdx: number = -1;
@@ -38,26 +46,37 @@ export class ViewerElement2D extends LitElement {
   private _deltaX: number = 0;
   private _deltaY: number = 0;
   private _minZoomLevel: number = -1;
-  private _lastDoublePressPointer: Pointer = { clientX: -1, clientY: -1, id: -1 };
+  private _lastDoublePressPointer: Pointer = {
+    clientX: -1,
+    clientY: -1,
+    id: -1,
+  };
   private _lastDoublePressTimeStamp: number = 0;
   private _isDown: boolean = false;
 
   private _viewer: OpenSeadragon.Viewer | null = null;
-  private _viewerHomeBounds: OpenSeadragon.Rect = new OpenSeadragon.Rect(0, 0, 0, 0, 0)
+  private _viewerHomeBounds: OpenSeadragon.Rect = new OpenSeadragon.Rect(
+      0,
+      0,
+      0,
+      0,
+      0,
+  );
 
   render() {
     return html`
-      <div id="image_viewer"
-      @pointermove= "${this._handlePointerMove}"></div>
+      <div id="image_viewer" @pointermove="${this._handlePointerMove}"></div>
       <div id="overlay"></div>
-    `
+    `;
   }
 
   firstUpdated(): void {
-    const viewerBase = this.renderRoot.querySelector('#image_viewer') as HTMLElement;
+    const viewerBase = this.renderRoot.querySelector(
+        '#image_viewer',
+    ) as HTMLElement;
 
     if (viewerBase == null) {
-      console.log("coudn't find element #image_viewer");
+      console.log('coudn\'t find element #image_viewer');
       return;
     }
 
@@ -68,22 +87,21 @@ export class ViewerElement2D extends LitElement {
       showZoomControl: false,
       showHomeControl: false,
       showNavigator: false,
-      navigatorPosition: "TOP_LEFT",
+      navigatorPosition: 'TOP_LEFT',
       minZoomImageRatio: 1,
-      maxZoomLevel: 100, //same as 3d viewer
-      //maxZoomPixelRatio: 20,
+      maxZoomLevel: 100, // same as 3d viewer
+      // maxZoomPixelRatio: 20,
       imageSmoothingEnabled: false,
       visibilityRatio: 1,
       constrainDuringPan: true,
-      defaultZoomLevel: 0, //0 <- fit to view
-      placeholderFillStyle: "#FF8800",
+      defaultZoomLevel: 0, // 0 <- fit to view
+      placeholderFillStyle: '#FF8800',
       preserveViewport: true,
-      //ajaxWithCredentials: false, ?
+      // ajaxWithCredentials: false, ?
       loadTilesWithAjax: true,
       imageLoaderLimit: 1,
       zoomPerScroll: 1.4,
-      gestureSettingsMouse: 
-      {
+      gestureSettingsMouse: {
         scrollToZoom: true,
         clickToZoom: false,
         dblClickToZoom: false,
@@ -91,8 +109,7 @@ export class ViewerElement2D extends LitElement {
         // @ts-ignore
         zoomToRefPoint: false,
       },
-      gestureSettingsPen: 
-      {
+      gestureSettingsPen: {
         scrollToZoom: true,
         clickToZoom: false,
         dblClickToZoom: false,
@@ -100,8 +117,7 @@ export class ViewerElement2D extends LitElement {
         // @ts-ignore
         zoomToRefPoint: false,
       },
-      gestureSettingsUnknown:  
-      {
+      gestureSettingsUnknown: {
         scrollToZoom: true,
         clickToZoom: false,
         dblClickToZoom: false,
@@ -112,26 +128,55 @@ export class ViewerElement2D extends LitElement {
       preserveOverlays: true,
     });
 
-    console.log("Viewer 2D", this._viewer, this.clientHeight, this.clientWidth);
+    console.log('Viewer 2D', this._viewer, this.clientHeight, this.clientWidth);
     this._viewer.addHandler('resize', this._handleImageResizeEvent.bind(this));
     this._viewer.addHandler('tile-loaded', this._handleTileLoaded.bind(this));
     this._viewer.addHandler('zoom', this._handleZoomChanged.bind(this));
     this._viewer.addHandler('rotate', this._checkIfMinZoomChanged.bind(this));
-    this._viewer.addHandler('update-viewport', this._checkIfCenterPosIsUpdated.bind(this));
-    this._viewer.addHandler('canvas-press', doubleEventHandler(this._handleCanvasDoublePressEvent.bind(this)));
-    this._viewer.addHandler('viewport-change', this._handleViewportChangedEvent.bind(this));
+    this._viewer.addHandler(
+        'update-viewport',
+        this._checkIfCenterPosIsUpdated.bind(this),
+    );
+    this._viewer.addHandler(
+        'canvas-press',
+        doubleEventHandler(this._handleCanvasDoublePressEvent.bind(this)),
+    );
+    this._viewer.addHandler(
+        'viewport-change',
+        this._handleViewportChangedEvent.bind(this),
+    );
 
-    this._viewer.addOverlay(this.hotspotOverlay, new OpenSeadragon.Point(0,0), OpenSeadragon.Placement.CENTER)
-    this.hotspotOverlay.style.opacity = "0";
-    const singleClickEventHandler = new SingleClickEventHandler(this.parentElement, 'pointerdown'); 
-    singleClickEventHandler.on("single-click", this._handleSingleClickEvent.bind(this));
+    this._viewer.addOverlay(
+        this.hotspotOverlay,
+        new OpenSeadragon.Point(0, 0),
+        OpenSeadragon.Placement.CENTER,
+    );
+    this.hotspotOverlay.style.opacity = '0';
+    const singleClickEventHandler = new SingleClickEventHandler(
+        this.parentElement,
+        'pointerdown',
+    );
+    singleClickEventHandler.on(
+        'single-click',
+        this._handleSingleClickEvent.bind(this),
+    );
 
-    this.measurementTool.on('change-image-hotspot-visibility', (showHotspot: boolean) => this.hotspotOverlay.style.opacity = showHotspot? '1':"0");
-    this.measurementTool.on('update-image-hotspot-position-requested',this._updateImageHotspotPosition.bind(this));
+    this.measurementTool.on(
+        'change-image-hotspot-visibility',
+        (showHotspot: boolean) =>
+          (this.hotspotOverlay.style.opacity = showHotspot ? '1' : '0'),
+    );
+    this.measurementTool.on(
+        'update-image-hotspot-position-requested',
+        this._updateImageHotspotPosition.bind(this),
+    );
   }
 
   connectWithSettings(viewerSettings: ViewerSettings): void {
-    viewerSettings.imageRotation.on('rotation-angle-changed', this.rotateImage.bind(this))
+    viewerSettings.imageRotation.on(
+        'rotation-angle-changed',
+        this.rotateImage.bind(this),
+    );
   }
 
   resize(height: number, width: number, transformString: string): void {
@@ -143,13 +188,18 @@ export class ViewerElement2D extends LitElement {
 
   setImageFiles(imageFiles: Array<string>) {
     this._imageFiles = imageFiles;
-    console.log("Image Files has been set");
+    console.log('Image Files has been set');
   }
 
-  loadNextImage(imageIdx: number): void {
-
+  async loadNextImage(imageIdx: number): Promise<void> {
     if (imageIdx >= this._imageFiles.length) {
-      console.log("Image with index", imageIdx, "cannot be loaded because only", this._imageFiles.length, "images exist");
+      console.log(
+          'Image with index',
+          imageIdx,
+          'cannot be loaded because only',
+          this._imageFiles.length,
+          'images exist',
+      );
       return;
     }
 
@@ -163,17 +213,19 @@ export class ViewerElement2D extends LitElement {
       return;
     }
 
-    const imageUrl = this.src2D + this._imageFiles[this._currentImageIdx] + this.imageType;
+    const imageUrl = await this.viewSettings.resolve2dFileURL(
+        this._imageFiles[this._currentImageIdx],
+    );
+
     this._viewer.open({
       type: 'image',
-      url: imageUrl
+      url: imageUrl,
     });
 
-    console.log("Loaded image", imageUrl)
+    console.log('Loaded image', imageUrl);
   }
 
   rotateImage(rotationAngle: number): void {
-
     if (this._currentSyncRotationAngle == rotationAngle) {
       return;
     }
@@ -197,7 +249,7 @@ export class ViewerElement2D extends LitElement {
       return;
     }
 
-    console.log("Zooom image, ", zoomLevel)
+    console.log('Zooom image, ', zoomLevel);
     this._viewer.viewport.zoomTo(zoomLevel, undefined, true);
   }
 
@@ -214,17 +266,21 @@ export class ViewerElement2D extends LitElement {
       return [0, 0];
     }
 
-    const imgCenterInViewer = this._viewer.viewport.imageToViewerElementCoordinates(this._imageCenter);
+    const imgCenterInViewer =
+      this._viewer.viewport.imageToViewerElementCoordinates(this._imageCenter);
     const deltaX = this.clientWidth * 0.5 - imgCenterInViewer.x;
     const deltaY = this.clientHeight * 0.5 - imgCenterInViewer.y;
 
     return [deltaX, deltaY];
   }
 
-
   private _handlePointerMove(event: PointerEvent) {
-
-    if (this._viewer == null || this._viewer.isMouseNavEnabled() || event.pointerId != this._lastDoublePressPointer.id || !this._isDown) {
+    if (
+      this._viewer == null ||
+      this._viewer.isMouseNavEnabled() ||
+      event.pointerId != this._lastDoublePressPointer.id ||
+      !this._isDown
+    ) {
       return;
     }
 
@@ -238,19 +294,18 @@ export class ViewerElement2D extends LitElement {
     this._lastDoublePressPointer.clientX = event.clientX;
     this._lastDoublePressPointer.clientY = event.clientY;
 
-    //don't need to check if mouse is down, because if mouse is up, 3d viewer is "active" and no more pointer events are fired
-    this.dispatchEvent(new CustomEvent('pointer-move-in-disable-mode', {
-      detail: {
-        dx: dx,
-        dy: dy
-      }
-    }));
-
+    // don't need to check if mouse is down, because if mouse is up, 3d viewer is "active" and no more pointer events are fired
+    this.dispatchEvent(
+        new CustomEvent('pointer-move-in-disable-mode', {
+          detail: {
+            dx: dx,
+            dy: dy,
+          },
+        }),
+    );
   }
 
-
   private _handlePointerUpAfterDoublePress(event: PointerEvent): void {
-
     this._isDown = false;
     if (this._viewer == null || this._viewer.isMouseNavEnabled()) {
       return;
@@ -259,64 +314,86 @@ export class ViewerElement2D extends LitElement {
     if (event.timeStamp - this._lastDoublePressTimeStamp > 700) {
       this.dispatchEvent(new Event('double-press-completed'));
     }
-
   }
 
-  private _updateImageHotspotPosition(xImageCoor: number,yImageCoor:number)
-  {
-      console.log("Hotspot update-image-hotspot-position", xImageCoor, yImageCoor);
-      if(this._viewer == null){
-        return;
-      }
+  private _updateImageHotspotPosition(xImageCoor: number, yImageCoor: number) {
+    console.log(
+        'Hotspot update-image-hotspot-position',
+        xImageCoor,
+        yImageCoor,
+    );
+    if (this._viewer == null) {
+      return;
+    }
 
-      this._viewer.updateOverlay(this.hotspotOverlay, this._viewer.viewport.imageToViewportCoordinates(xImageCoor, yImageCoor), OpenSeadragon.Placement.CENTER)
+    this._viewer.updateOverlay(
+        this.hotspotOverlay,
+        this._viewer.viewport.imageToViewportCoordinates(xImageCoor, yImageCoor),
+        OpenSeadragon.Placement.CENTER,
+    );
   }
 
   private _handleSingleClickEvent(event: PointerEvent) {
     if (this._viewer == null || !this.measurementTool.isEditModeActive) {
+      console.log('Single click event: ignoring, viewer null or measurement tool not active.');
       return;
     }
     const rect = this.parentElement.getBoundingClientRect();
-    var viewportPoint = this._viewer.viewport.pointFromPixel(new OpenSeadragon.Point(event.clientX - rect.x, event.clientY - rect.y));
-    var imageCoor = this._viewer.viewport.viewportToImageCoordinates(viewportPoint);
+    const viewportPoint = this._viewer.viewport.pointFromPixel(
+        new OpenSeadragon.Point(event.clientX - rect.x, event.clientY - rect.y),
+    );
+    const imageCoor =
+      this._viewer.viewport.viewportToImageCoordinates(viewportPoint);
 
-    this.measurementTool.addPointFromImage(imageCoor.x,imageCoor.y);
+    this.measurementTool.addPointFromImage(imageCoor.x, imageCoor.y);
 
-    this._viewer.updateOverlay(this.hotspotOverlay, viewportPoint, OpenSeadragon.Placement.CENTER)
-    console.log("Hotspot in image added")
+    this._viewer.updateOverlay(
+        this.hotspotOverlay,
+        viewportPoint,
+        OpenSeadragon.Placement.CENTER,
+    );
+    console.log('Hotspot in image added');
   }
-  private _handleCanvasDoublePressEvent(event: CanvasPressEvent) {
 
+  private _handleCanvasDoublePressEvent(event: CanvasPressEvent) {
     this._isDown = true;
     const pointerEvent = event.originalEvent as PointerEvent;
 
+    this._lastDoublePressPointer = {
+      clientX: pointerEvent.clientX,
+      clientY: pointerEvent.clientX,
+      id: pointerEvent.pointerId,
+    };
 
-    this._lastDoublePressPointer = { clientX: pointerEvent.clientX, clientY: pointerEvent.clientX, id: pointerEvent.pointerId };
-
-    this.dispatchEvent(new CustomEvent('double-press', {
-      detail: {
-        pointerEvent: pointerEvent,
-      }
-    }));
+    this.dispatchEvent(
+        new CustomEvent('double-press', {
+          detail: {
+            pointerEvent: pointerEvent,
+          },
+        }),
+    );
 
     if (this._viewer == null) {
       return;
     }
 
-    console.log("Add event handler")
+    console.log('Add event handler');
     this._lastDoublePressTimeStamp = pointerEvent.timeStamp;
-    this.parentElement.addEventListener('pointerup', this._handlePointerUpAfterDoublePress.bind(this), { once: true });
+    this.parentElement.addEventListener(
+        'pointerup',
+        this._handlePointerUpAfterDoublePress.bind(this),
+        {once: true},
+    );
   }
 
   private _checkIfZoomIsInvalid: () => void = debounce(() => {
-
     if (this._viewer == null) {
       return;
     }
 
     const viewport = this._viewer.viewport;
     if (viewport.getZoom(true) < viewport.getMinZoom()) {
-      console.log("Zoom is invalid", viewport.getZoom(true))
+      console.log('Zoom is invalid', viewport.getZoom(true));
       viewport.applyConstraints();
     }
   }, 250);
@@ -326,27 +403,26 @@ export class ViewerElement2D extends LitElement {
       return;
     }
 
-    if (this._viewerHomeBounds.equals(this._viewer.viewport.getHomeBounds())) { //if the home bounds are the same, just zoom or pan has changed
+    if (this._viewerHomeBounds.equals(this._viewer.viewport.getHomeBounds())) {
+      // if the home bounds are the same, just zoom or pan has changed
       return;
     }
 
     this._viewerHomeBounds = this._viewer.viewport.getHomeBounds();
 
-    this.dispatchEvent(new CustomEvent('image-zoom-changed', {
-      detail: {
-        zoomLevel: this._viewer.viewport.getZoom(false),
-      }
-    }))
-
-
+    this.dispatchEvent(
+        new CustomEvent('image-zoom-changed', {
+          detail: {
+            zoomLevel: this._viewer.viewport.getZoom(false),
+          },
+        }),
+    );
   }
   private _handleImageResizeEvent() {
     this._checkIfMinZoomChanged();
   }
 
-
   private _handleTileLoaded(event: TileEvent) {
-
     this._checkIfZoomIsInvalid();
     this._checkIfMinZoomChanged();
     this._checkIfCenterPosIsUpdated();
@@ -363,50 +439,51 @@ export class ViewerElement2D extends LitElement {
     }
     if (this._minZoomLevel != this._viewer.viewport.getMinZoom()) {
       this._minZoomLevel = this._viewer.viewport.getMinZoom();
-      console.log("emit min zoom changed", this._minZoomLevel)
-      this.dispatchEvent(new CustomEvent('min-zoom-level-changed', {
-        detail: {
-          zoomLevel: this._minZoomLevel
-        }
-      }));
+      console.log('emit min zoom changed', this._minZoomLevel);
+      this.dispatchEvent(
+          new CustomEvent('min-zoom-level-changed', {
+            detail: {
+              zoomLevel: this._minZoomLevel,
+            },
+          }),
+      );
     }
   }
 
   private _checkIfCenterPosIsUpdated: () => void = debounce(() => {
-
-    const [deltaX, deltaY] = this.getImageCenter()
+    const [deltaX, deltaY] = this.getImageCenter();
 
     if (this._deltaX != deltaX || this._deltaY != deltaY) {
       this._deltaX = deltaX;
       this._deltaY = deltaY;
-      this.dispatchEvent(new CustomEvent('image-shifted', {
-        detail: {
-          deltaX: deltaX,
-          deltaY: deltaY
-        }
-      }));
+      this.dispatchEvent(
+          new CustomEvent('image-shifted', {
+            detail: {
+              deltaX: deltaX,
+              deltaY: deltaY,
+            },
+          }),
+      );
     }
-
   }, 15);
 
   private _handleZoomChanged(event: ZoomEvent) {
-
     if (this._viewer == null || event.immediately == true) {
-      console.log("Return zoom", event.zoom)
+      console.log('Return zoom', event.zoom);
       return;
     }
 
-
-    console.log("image zoom changed 1", event.zoom)
+    console.log('image zoom changed 1', event.zoom);
 
     this._checkIfZoomIsInvalid();
 
-    this.dispatchEvent(new CustomEvent('image-zoom-changed', {
-      detail: {
-        zoomLevel: event.zoom
-      }
-    }));
-
+    this.dispatchEvent(
+        new CustomEvent('image-zoom-changed', {
+          detail: {
+            zoomLevel: event.zoom,
+          },
+        }),
+    );
   }
 
   static styles = css`
@@ -420,7 +497,7 @@ export class ViewerElement2D extends LitElement {
       background-color: transparent;
     }
 
-    .hotspot{
+    .hotspot {
       display: block;
       width: 20px;
       height: 20px;
@@ -434,16 +511,16 @@ export class ViewerElement2D extends LitElement {
       position: relative;
       font-size: 12px;
       padding: 0;
-  }
+    }
 
-  #overlay{
-    display: none;
-    background-color: transparent;
-    opacity: 0;
-    width: 20px;
-    height: 20px;
-    border-radius: 20px;
-    border: 3px solid rgb(0, 128, 200) ;
-  }
-  `
+    #overlay {
+      display: none;
+      background-color: transparent;
+      opacity: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 20px;
+      border: 3px solid rgb(0, 128, 200);
+    }
+  `;
 }
