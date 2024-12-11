@@ -6,6 +6,7 @@ import '@ui5/webcomponents/dist/Panel';
 import '@ui5/webcomponents/dist/Label';
 import '@ui5/webcomponents/dist/Title';
 import '@ui5/webcomponents/dist/CheckBox';
+import '@ui5/webcomponents/dist/Panel';
 import '@ui5/webcomponents/dist/List';
 import '@ui5/webcomponents/dist/ListItemStandard';
 import {MeasurementTool} from '../measurement-tool';
@@ -21,58 +22,60 @@ export class MeasurementToolElement extends LitElement {
 
   render() {
     return html`
-      <div
-        id="layout"
-        class="${this.isColumnMode ? 'ver-orientation' : 'hor-orientation'}"
-      >
+      <ui5-panel id="layout" class="${this.isColumnMode ? 'ver-orientation' : 'hor-orientation'}">
         <div class="row">
           <div class="alignCenter">
-            <ui5-button @click="${this._handleNewPathClicked}" title="${this.measurementTool.numPoints > 0 ? 'Reset current measurement' : 'Start new measurement'}">
-              ${this.measurementTool.numPoints > 0 ? 'Reset' : 'New'}
+            <ui5-button @click="${this._handleNewPathClicked}" title="${this.measurementTool.isEditModeActive || this.measurementTool.numPoints > 0  ? 'Reset current measurement' : 'Start new measurement'}">
+              ${this.measurementTool.isEditModeActive || this.measurementTool.numPoints > 0 ? 'Reset' : 'New'}
             </ui5-button>
           </div>
-          <div class="alignCenter">
-            <ui5-button
-              ?disabled="${!this.measurementTool.isEditModeActive &&
-              this.measurementTool.numPoints == 0}"
-              @click="${this._handleUpdateEditStateClicked}"
-              title="${this.measurementTool.isEditModeActive ? 'Pause current measurement' : 'Continue current measurement'}"
-            >
-              ${this.measurementTool.isEditModeActive ? 'Stop' : 'Continue'}
-            </ui5-button>
-          </div>
-          <div class="alignCenter">
-            <ui5-button
-              ?disabled="${this.measurementTool.numPoints < 2}"
-              @click="${() => { this.measurementTool.downloadPoints() }}"
-              title="Download as CSV"
-            >Download</ui5-button>
-          </div>
+          ${!this.measurementTool.isEditModeActive && this.measurementTool.numPoints === 0 ? nothing : html`
+            <div class="alignCenter">
+              <ui5-button
+                @click="${this._handleUpdateEditStateClicked}"
+                title="${this.measurementTool.isEditModeActive ? 'Pause current measurement' : 'Continue current measurement'}"
+              >
+                ${this.measurementTool.isEditModeActive ? 'Stop' : 'Continue'}
+              </ui5-button>
+            </div>
+            <div class="alignCenter">
+              <ui5-button
+                ?disabled="${this.measurementTool.numPoints === 0}"
+                @click="${() => { this.measurementTool.downloadPoints() }}"
+                title="Download as CSV"
+              >Download</ui5-button>
+            </div>
+          `}
         </div>
-        <div>
-          <ui5-checkbox text="Show distances" ?checked=${this.measurementTool.showMeasurementDistances} @change="${(ev: Event) => this.measurementTool.showMeasurementDistances = (ev.target as HTMLInputElement).checked}"></ui5-checkbox>
-        </div>
-        ${this.measurementTool.measurementPoints.length === 0 ? nothing : html `
-        <table>
-          <thead>
-            <tr><th>#</th><th>x</th><th>y</th><th>z</th><th>distance</th><th>label</th></tr>
-          </thead>
-          <tbody>
-          ${this.measurementTool.measurementPoints.map((point, index) => html`
-            <tr>
-              <td>${index}</td>
-              <td>${point.positionInModelCoor.x.toFixed(this.precision)}</td>
-              <td>${point.positionInModelCoor.y.toFixed(this.precision)}</td>
-              <td>${point.positionInModelCoor.z.toFixed(this.precision)}</td>
-              <td>${index > 0 ? this.measurementTool.measurementDistances[index - 1].distance.toFixed(this.precision) : ''}</td>
-              <td><input .value="${point.label}" @change="${(ev: InputEvent) => { point.label = (ev.target as HTMLInputElement).value }}"></td>
-            </tr>
-          `)}
-            <tr><td colspan="4"></td><td class="sum">${this.measurementTool.measuredLength.toFixed(5)}</td><td></td></tr>
-          </tbody>
-        </table>
+        ${this.measurementTool.numPoints > 0 || !this.measurementTool.isEditModeActive ? nothing : html`
+          <div class="pt-1">Click on 2D/3D view to create a measurement point</div>
         `}
-      </div>
+        ${this.measurementTool.numPoints === 0 ? nothing : html`
+          <div>
+            <ui5-checkbox text="Show distances in 3D view" ?checked=${this.measurementTool.showMeasurementDistances} @change="${(ev: Event) => this.measurementTool.showMeasurementDistances = (ev.target as HTMLInputElement).checked}"></ui5-checkbox>
+          </div>
+          <table>
+            <thead>
+              <tr><th>#</th><th>x</th><th>y</th><th>z</th><th>&Delta;</th><th>label</th></tr>
+            </thead>
+            <tbody>
+            ${this.measurementTool.measurementPoints.map((point, index) => html`
+              <tr>
+                <td>${index}</td>
+                <td>${point.positionInModelCoor.x.toFixed(this.precision)}</td>
+                <td>${point.positionInModelCoor.y.toFixed(this.precision)}</td>
+                <td>${point.positionInModelCoor.z.toFixed(this.precision)}</td>
+                <td>${index > 0 ? this.measurementTool.measurementDistances[index - 1].distance.toFixed(this.precision) : ''}</td>
+                <td><input .value="${point.label}" @change="${(ev: InputEvent) => { point.label = (ev.target as HTMLInputElement).value }}"></td>
+              </tr>
+            `)}
+            ${this.measurementTool.numPoints < 2 ? nothing : html`
+              <tr><td colspan="4"></td><td class="sum">${this.measurementTool.measuredLength.toFixed(5)}</td><td></td></tr>
+            `}
+            </tbody>
+          </table>
+        `}
+      </ui5-panel>
     `;
   }
 
@@ -86,14 +89,13 @@ export class MeasurementToolElement extends LitElement {
   }
 
   private _handleNewPathClicked() {
+    this.measurementTool.isEditModeActive = this.measurementTool.measurementPoints.length === 0;
     this.measurementTool.resetPoints();
-    this.measurementTool.isEditModeActive = true;
     this.requestUpdate();
   }
 
   private _handleUpdateEditStateClicked() {
-    this.measurementTool.isEditModeActive =
-      !this.measurementTool.isEditModeActive;
+    this.measurementTool.isEditModeActive = !this.measurementTool.isEditModeActive;
     this.requestUpdate();
   }
 
@@ -131,6 +133,8 @@ export class MeasurementToolElement extends LitElement {
       justify-content: space-between;
       width: 100%;
     }
+
+    .pt-1 { padding-top: 10px; }
 
     .alignCenter {
       width: 100%;

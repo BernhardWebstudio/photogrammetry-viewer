@@ -4,13 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Photogrammetry Viewer</title>
-    <link rel="stylesheet" href="./src/index.css" />
-    <script type="module" src="/src/index.ts"></script>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; display: flex; place-items: center; height: 100vh; }
+      #element { width: 100%; height: 100%; }
+    </style>
+    <script type="module" src="./src/index.ts"></script>
   </head>
   <body>
     <photogrammetry-viewer id="element" isYupTransformApplied
       srcScanInformation='http://localhost:8000/Leptinotarsa_decemlineata_NOKI_metashape_cameras.xml' 
-      src3D = 'http://localhost:8000/3D/Yup.gltf'
+      src3D = 'http://localhost:8000/Yup.gltf'
       src2D = 'http://localhost:8000/edof/'>
     </photogrammetry-viewer>
 
