@@ -25,6 +25,7 @@ import '@ui5/webcomponents/dist/Button.js';
 import '@ui5/webcomponents-icons/dist/decline';
 import '@ui5/webcomponents-icons-tnt/dist/unit';
 import '@ui5/webcomponents-icons/dist/measure';
+import '@ui5/webcomponents-icons/dist/camera';
 import '@ui5/webcomponents-icons/dist/chart-axis';
 import '@ui5/webcomponents-icons/dist/rotate';
 
@@ -34,6 +35,7 @@ import './ui/pv-menu-item.ts';
 import './menu/environment-settings-element.ts';
 import './menu/rotation-settings-element.ts';
 import './menu/measurement-tool-element.ts';
+import './menu/export-to-image-tool-element.ts';
 import {
   ISegmentedButtonItem,
   SegmentedButtonSelectionChangeEventDetail,
@@ -158,6 +160,11 @@ export class ControlPanel extends LitElement {
             ?isColumnMode=${this.isColumnMode}
             .measurementTool="${this.viewerSettings.measurementTool}"
           ></measurement-tool>
+        </pv-menu-item>
+        <pv-menu-item icon="camera" title="Save view as image" idx="4">
+          <export-tool
+            .viewerSettings="${this.viewerSettings}"
+          ></export-tool>
         </pv-menu-item>
       </pv-menu>
     `;

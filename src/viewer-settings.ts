@@ -3,6 +3,8 @@ import {EulerYXZ} from './eulerYXZ';
 import {MeasurementTool} from './measurement-tool';
 import {ColorRGB, getRGBColor} from '@ui5/webcomponents-base/dist/util/ColorConversion.js';
 import {Vector3} from 'three';
+import { ViewerElement3D } from './viewer-3d';
+import { ViewerElement2D } from './viewer-2d';
 
 
 function convertColorRGBToString(color: ColorRGB): string {
@@ -14,6 +16,8 @@ export interface ViewerSettings {
     modelOrientation: ModelOrientationSettings;
     measurementTool: MeasurementTool;
     environment3D: EnvironmentSettings;
+    viewer3DElement: ViewerElement3D | null;
+    viewer2DElement: ViewerElement2D | null;
 }
 
 export class ModelOrientationSettings extends EventEmitter {

@@ -92,6 +92,8 @@ export class PhotogrammetryViewer extends LitElement {
       modelOrientation: new ModelOrientationSettings(),
       measurementTool: new MeasurementTool(),
       environment3D: new EnvironmentSettings(),
+      viewer2DElement: null,
+      viewer3DElement: null
     };
 
     this._viewerSettings.modelOrientation.on(
@@ -189,6 +191,8 @@ export class PhotogrammetryViewer extends LitElement {
     this._resizeObserver.observe(this.viewerBase);
     this.viewer2DElement.connectWithSettings(this._viewerSettings);
     this.viewer3DElement.connectWithSettings(this._viewerSettings);
+    this._viewerSettings.viewer2DElement = this.viewer2DElement;
+    this._viewerSettings.viewer3DElement = this.viewer3DElement;
   }
 
   updated(changedProperties: Map<string, unknown>) {
@@ -526,8 +530,6 @@ export class PhotogrammetryViewer extends LitElement {
 
     .hotspot {
       display: block;
-      width: 20px;
-      height: 20px;
       border-radius: 20px;
       border: none;
       background-color: #fff;
@@ -537,7 +539,7 @@ export class PhotogrammetryViewer extends LitElement {
       transition: opacity 0.3s;
       position: relative;
       font-size: 12px;
-      padding: 0;
+      padding: 2px 6px;
     }
 
     .hotspot:not([data-visible]) {
@@ -550,7 +552,6 @@ export class PhotogrammetryViewer extends LitElement {
     .hotspot:focus {
       border: 3px solid rgb(0, 128, 200);
       outline: none;
-      padding: 0;
     }
 
     .hotspot > * {
