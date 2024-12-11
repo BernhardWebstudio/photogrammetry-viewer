@@ -5,8 +5,9 @@ import '@ui5/webcomponents/dist/Button';
 import '@ui5/webcomponents/dist/Panel';
 import '@ui5/webcomponents/dist/Label';
 import '@ui5/webcomponents/dist/Title';
-import '@ui5/webcomponents/dist/List.js';
-import '@ui5/webcomponents/dist/ListItemStandard.js';
+import '@ui5/webcomponents/dist/CheckBox';
+import '@ui5/webcomponents/dist/List';
+import '@ui5/webcomponents/dist/ListItemStandard';
 import {MeasurementTool} from '../measurement-tool';
 
 @customElement('measurement-tool')
@@ -16,6 +17,7 @@ export class MeasurementToolElement extends LitElement {
 
   @property({type: Object})
   measurementTool!: MeasurementTool;
+  precision = 4;
 
   render() {
     return html`
@@ -25,7 +27,7 @@ export class MeasurementToolElement extends LitElement {
       >
         <div class="row">
           <div class="alignCenter">
-            <ui5-button @click="${this._handleNewPathClicked}">
+            <ui5-button @click="${this._handleNewPathClicked}" title="${this.measurementTool.numPoints > 0 ? 'Reset current measurement' : 'Start new measurement'}">
               ${this.measurementTool.numPoints > 0 ? 'Reset' : 'New'}
             </ui5-button>
           </div>
@@ -34,18 +36,23 @@ export class MeasurementToolElement extends LitElement {
               ?disabled="${!this.measurementTool.isEditModeActive &&
               this.measurementTool.numPoints == 0}"
               @click="${this._handleUpdateEditStateClicked}"
+              title="${this.measurementTool.isEditModeActive ? 'Pause current measurement' : 'Continue current measurement'}"
             >
               ${this.measurementTool.isEditModeActive ? 'Stop' : 'Continue'}
             </ui5-button>
           </div>
           <div class="alignCenter">
             <ui5-button
-              ?disabled="${this.measurementTool.isEditModeActive || this.measurementTool.numPoints == 0}"
+              ?disabled="${this.measurementTool.numPoints < 2}"
               @click="${() => { this.measurementTool.downloadPoints() }}"
+              title="Download as CSV"
             >Download</ui5-button>
           </div>
         </div>
-        ${this.measurementTool.numPoints === 0 ? nothing : html `
+        <div>
+          <ui5-checkbox text="Show distances" ?checked=${this.measurementTool.showMeasurementDistances} @change="${(ev: Event) => this.measurementTool.showMeasurementDistances = (ev.target as HTMLInputElement).checked}"></ui5-checkbox>
+        </div>
+        ${this.measurementTool.measurementPoints.length === 0 ? nothing : html `
         <table>
           <thead>
             <tr><th>#</th><th>x</th><th>y</th><th>z</th><th>distance</th><th>label</th></tr>
@@ -54,14 +61,14 @@ export class MeasurementToolElement extends LitElement {
           ${this.measurementTool.measurementPoints.map((point, index) => html`
             <tr>
               <td>${index}</td>
-              <td>${point.positionInModelCoor.x}</td>
-              <td>${point.positionInModelCoor.y}</td>
-              <td>${point.positionInModelCoor.z}</td>
-              <td>${index > 0 ? this.measurementTool.measurementDistances[index - 1].distance : ''}</td>
+              <td>${point.positionInModelCoor.x.toFixed(this.precision)}</td>
+              <td>${point.positionInModelCoor.y.toFixed(this.precision)}</td>
+              <td>${point.positionInModelCoor.z.toFixed(this.precision)}</td>
+              <td>${index > 0 ? this.measurementTool.measurementDistances[index - 1].distance.toFixed(this.precision) : ''}</td>
               <td><input .value="${point.label}" @change="${(ev: InputEvent) => { point.label = (ev.target as HTMLInputElement).value }}"></td>
             </tr>
           `)}
-            <tr><td colspan="4"></td><td>&Sigma;: ${this.measurementTool.measuredLength}</td><td></td></tr>
+            <tr><td colspan="4"></td><td class="sum">${this.measurementTool.measuredLength.toFixed(5)}</td><td></td></tr>
           </tbody>
         </table>
         `}
@@ -71,6 +78,7 @@ export class MeasurementToolElement extends LitElement {
 
   firstUpdated(): void {
     this.measurementTool.on('update-requested', () => this.requestUpdate());
+    this.measurementTool.on('hotspot-added', () => this.requestUpdate());
   }
 
   updated(changedProperties: Map<string, unknown>) {
@@ -138,5 +146,9 @@ export class MeasurementToolElement extends LitElement {
     ui5-label {
       --sapFontSize: 15;
     }
+
+    td { padding: 1px 8px; text-align: right; }
+    td.sum { position: relative; }
+    td.sum:before { content: '\\03a3'; left: -10px; position: absolute; }
   `;
 }

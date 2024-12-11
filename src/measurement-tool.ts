@@ -17,6 +17,7 @@ export class MeasurementTool extends EventEmitter {
     private _imageCamOrientation: Matrix4 = new Matrix4();
 
     private _measurementDistances: MeasurementDistance[] = [];
+    private _showMeasurementDistances = true
     private _sceneElementGroup = new Group();
 
     set imageSensor(sensor: Sensor) {
@@ -136,7 +137,10 @@ export class MeasurementTool extends EventEmitter {
             this._currentTranslation,
             this._currentOrientation,
         );
-
+        if (!this._showMeasurementDistances) {
+          newMeasurementDistance.hide()
+        }
+  
         this._measuredLength += newMeasurementDistance.distance;
         this._sceneElementGroup.add(newMeasurementDistance.sceneElement);
         this._measurementDistances.push(newMeasurementDistance);
@@ -190,6 +194,25 @@ export class MeasurementTool extends EventEmitter {
       });
 
       this.emit('scene-update-requested');
+    }
+
+    get showMeasurementDistances() {
+      return this._showMeasurementDistances
+    }
+
+    set showMeasurementDistances(value: boolean) {
+      if (this._showMeasurementDistances != value) {
+        this._showMeasurementDistances = value;
+        this._measurementDistances.forEach((distance) => {
+          if (value) {
+            distance.show();
+          } else {
+            distance.hide();
+          }
+        });
+
+        this.emit('scene-update-requested');
+      }
     }
 
     downloadPoints() {
@@ -480,7 +503,6 @@ export class SceneHotspotElement extends EventEmitter {
 }
 
 export class MeasurementPoint extends SceneHotspotElement {
-  label = ''
 
   constructor(index: number, position: Vector3, normal: Vector3, sceneOrientation: Euler) {
     super(position, normal, sceneOrientation);
@@ -494,6 +516,14 @@ export class MeasurementPoint extends SceneHotspotElement {
       event.stopPropagation();
       this.emit('hotspot-selected', this.positionInSceneCoor);
     });
+  }
+
+  set label(value: string) {
+    this.domElement.textContent = value
+  }
+
+  get label(): string {
+    return this.domElement.textContent || ''
   }
 
   distanceTo(measurementPoint: MeasurementPoint): number {
