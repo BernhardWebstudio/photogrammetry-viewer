@@ -63,6 +63,10 @@ export class ViewerElement2D extends LitElement {
       0,
   );
 
+  get viewer() {
+    return this._viewer
+  }
+
   render() {
     return html`
       <div id="image_viewer" @pointermove="${this._handlePointerMove}"></div>
@@ -81,6 +85,7 @@ export class ViewerElement2D extends LitElement {
     }
 
     this._viewer = OpenSeadragon({
+      crossOriginPolicy: 'Anonymous',
       element: viewerBase,
       autoResize: true,
       showFullPageControl: false,
