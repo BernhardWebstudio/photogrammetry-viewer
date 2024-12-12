@@ -216,10 +216,10 @@ export class MeasurementTool extends EventEmitter {
     }
 
     downloadPoints() {
-      let csv = 'index,x,y,z,distance,label\n'
+      let csv = `index,x,y,z${this.showMeasurementDistances ? ',distance' : ''},label\n`
       this._measurementPoints.forEach((point, index) => {
         const coords = point.positionInModelCoor
-        csv += `${index},${coords.x},${coords.y},${coords.z},${index > 0 ? this._measurementDistances[index - 1].distance : ''},"${point.label.replace(/"/g, '""')}"\n`
+        csv += `${index},${coords.x},${coords.y},${coords.z}${this.showMeasurementDistances ? ',' + (index > 0 ? this._measurementDistances[index - 1].distance : '') : ''},"${point.label.replace(/"/g, '""')}"\n`
       })
       const link = document.createElement('a')
       link.href = window.URL.createObjectURL(new Blob([csv], { type: "text/csv" }))

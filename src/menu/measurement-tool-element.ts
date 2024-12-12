@@ -52,11 +52,11 @@ export class MeasurementToolElement extends LitElement {
         `}
         ${this.measurementTool.numPoints === 0 ? nothing : html`
           <div>
-            <ui5-checkbox text="Show distances in 3D view" ?checked=${this.measurementTool.showMeasurementDistances} @change="${(ev: Event) => this.measurementTool.showMeasurementDistances = (ev.target as HTMLInputElement).checked}"></ui5-checkbox>
+            <ui5-checkbox text="Calculate distances" ?checked=${this.measurementTool.showMeasurementDistances} @change="${(ev: Event) => { this.measurementTool.showMeasurementDistances = (ev.target as HTMLInputElement).checked; this.requestUpdate()}}"></ui5-checkbox>
           </div>
           <table>
             <thead>
-              <tr><th>#</th><th>x</th><th>y</th><th>z</th><th>&Delta;</th><th>label</th></tr>
+              <tr><th>#</th><th>x</th><th>y</th><th>z</th>${this.measurementTool.showMeasurementDistances ? html`<th>&Delta;</th>` : nothing}<th>label</th></tr>
             </thead>
             <tbody>
             ${this.measurementTool.measurementPoints.map((point, index) => html`
@@ -65,11 +65,13 @@ export class MeasurementToolElement extends LitElement {
                 <td>${point.positionInModelCoor.x.toFixed(this.precision)}</td>
                 <td>${point.positionInModelCoor.y.toFixed(this.precision)}</td>
                 <td>${point.positionInModelCoor.z.toFixed(this.precision)}</td>
-                <td>${index > 0 ? this.measurementTool.measurementDistances[index - 1].distance.toFixed(this.precision) : ''}</td>
+                ${!this.measurementTool.showMeasurementDistances ? nothing : html`
+                  <td>${index > 0 ? this.measurementTool.measurementDistances[index - 1].distance.toFixed(this.precision) : ''}</td>
+                `}
                 <td><input .value="${point.label}" @change="${(ev: InputEvent) => { point.label = (ev.target as HTMLInputElement).value }}"></td>
               </tr>
             `)}
-            ${this.measurementTool.numPoints < 2 ? nothing : html`
+            ${!this.measurementTool.showMeasurementDistances || this.measurementTool.numPoints < 2 ? nothing : html`
               <tr><td colspan="4"></td><td class="sum">${this.measurementTool.measuredLength.toFixed(5)}</td><td></td></tr>
             `}
             </tbody>
