@@ -45,6 +45,7 @@
     "@ui5/webcomponents-icons": "^2.4.0",
     "@ui5/webcomponents-icons-tnt": "^2.4.0",
     "events": "^3.3.0",
+    "html2canvas": "^1.4.1",
     "openseadragon": "^5.0.0"
   },
   "peerDependencies": {
