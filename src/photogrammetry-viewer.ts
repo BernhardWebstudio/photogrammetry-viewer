@@ -27,12 +27,6 @@ import {
 } from './public-settings';
 import {Vector3} from 'three';
 
-/**
- * An example element.
- *
- * @slot - This element has a slot
- * @csspart button - The button
- */
 @customElement('photogrammetry-viewer')
 export class PhotogrammetryViewer extends LitElement {
   // zup to yup applied
@@ -48,6 +42,9 @@ export class PhotogrammetryViewer extends LitElement {
 
   @property()
   srcScanInformation: string = ''; // 'http://localhost:8000/Leptinotarsa_decemlineata_NOKI_metashape_cameras.xml';
+
+  @property()
+  loadMeasurement: string | undefined
 
   // additional configuration
   @property({type: Object})
@@ -193,6 +190,10 @@ export class PhotogrammetryViewer extends LitElement {
     this.viewer3DElement.connectWithSettings(this._viewerSettings);
     this._viewerSettings.viewer2DElement = this.viewer2DElement;
     this._viewerSettings.viewer3DElement = this.viewer3DElement;
+    if (this.loadMeasurement !== undefined) {
+      const measurementUrl = this.src3D.split('/').slice(0, -1).join('/') + '/measurement.json'
+      this._viewerSettings.measurementTool.loadMeasurement(measurementUrl)
+    }
   }
 
   updated(changedProperties: Map<string, unknown>) {

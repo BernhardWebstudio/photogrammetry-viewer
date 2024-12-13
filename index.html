@@ -7,16 +7,14 @@
     <style>
       * { box-sizing: border-box; }
       body { margin: 0; display: flex; place-items: center; height: 100vh; }
-      #element { width: 100%; height: 100%; }
     </style>
     <script type="module" src="./src/index.ts"></script>
   </head>
   <body>
-    <photogrammetry-viewer id="element" isYupTransformApplied
+    <photogrammetry-viewer isYupTransformApplied
       srcScanInformation='http://localhost:8000/Leptinotarsa_decemlineata_NOKI_metashape_cameras.xml' 
-      src3D = 'http://localhost:8000/Yup.gltf'
-      src2D = 'http://localhost:8000/edof/'>
+      src3D='http://localhost:8000/Yup.gltf'
+      src2D='http://localhost:8000/edof/'>
     </photogrammetry-viewer>
-
   </body>
 </html>

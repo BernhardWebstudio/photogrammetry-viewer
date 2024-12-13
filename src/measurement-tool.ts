@@ -118,11 +118,11 @@ export class MeasurementTool extends EventEmitter {
       this.emit('calculate-hotspot-requested', camOrigin, direction);
     }
 
-    addPointFrom3DScene(position: Vector3D, normal: Vector3D, updateHotspotInImage: boolean = true): void {
+    addPointFrom3DScene(position: Vector3D, normal: Vector3D, updateHotspotInImage: boolean = true, label: string | number = this._measurementPoints.length): void {
       const currentIndex = this._measurementPoints.length;
       const positionAsThreeVector = new Vector3(position.x, position.y, position.z);
       const normalAsThreeVector = new Vector3(normal.x, normal.y, normal.z);
-      const measurementPoint = new MeasurementPoint(currentIndex, positionAsThreeVector, normalAsThreeVector, this._currentOrientation);
+      const measurementPoint = new MeasurementPoint(label, positionAsThreeVector, normalAsThreeVector, this._currentOrientation);
       measurementPoint.on('hotspot-selected', this._updateHotspotInImage.bind(this));
       measurementPoint.on('hotspot-focus-changed', (hotspotIsInFocus: boolean) => this.emit('change-image-hotspot-visibility', hotspotIsInFocus));
 
@@ -215,16 +215,47 @@ export class MeasurementTool extends EventEmitter {
       }
     }
 
-    downloadPoints() {
-      let csv = `index,x,y,z${this.showMeasurementDistances ? ',distance' : ''},label\n`
-      this._measurementPoints.forEach((point, index) => {
-        const coords = point.positionInModelCoor
-        csv += `${index},${coords.x},${coords.y},${coords.z}${this.showMeasurementDistances ? ',' + (index > 0 ? this._measurementDistances[index - 1].distance : '') : ''},"${point.label.replace(/"/g, '""')}"\n`
-      })
+    saveMeasurement(format: 'csv' | 'json' = 'csv') {
       const link = document.createElement('a')
-      link.href = window.URL.createObjectURL(new Blob([csv], { type: "text/csv" }))
-      link.download = 'measurement.csv'
+      if (format === 'csv') {
+        let csv = `index,x,y,z${this.showMeasurementDistances ? ',distance' : ''},label\n`
+        this._measurementPoints.forEach((point, index) => {
+          const coords = point.positionInModelCoor
+          csv += `${index},${coords.x},${coords.y},${coords.z}${this.showMeasurementDistances ? ',' + (index > 0 ? this._measurementDistances[index - 1].distance : '') : ''},"${point.label.replace(/"/g, '""')}"\n`
+        })
+        link.href = window.URL.createObjectURL(new Blob([csv], { type: "text/csv" }))
+        link.download = 'measurement.csv'
+      } else {
+        const measurement: Measurement = []
+        for (let i = 0; i < this._measurementPoints.length; i++) {
+          const point = this._measurementPoints[i]
+          measurement.push({
+            pos: [ point.positionInModelCoor.x, point.positionInModelCoor.y, point.positionInModelCoor.z ],
+            normal: [ point.normalInSceneCoor.x, point.normalInSceneCoor.y, point.normalInSceneCoor.z ],
+            label: point.label,
+            distance: this._showMeasurementDistances && i > 0 ? this._measurementDistances[i - 1].distance : undefined
+          })
+        }
+        link.href = window.URL.createObjectURL(new Blob([JSON.stringify(measurement)], { type: "application/json" }))
+        link.download = 'measurement.json'
+      }
       link.click()
+    }
+
+    async loadMeasurement(url: string) {
+      try {
+        const measurement: Measurement = await (await fetch(url)).json()
+        let measurementHasDistance = false
+        for (const point of measurement) {
+          const pos = { x: point.pos[0], y: point.pos[1], z: point.pos[2] }
+          const normal = { x: point.normal[0], y: point.normal[1], z: point.normal[2] }
+          this.addPointFrom3DScene(pos, normal, false, point.label)
+          measurementHasDistance = measurementHasDistance || point.distance !== undefined
+        }
+        this._showMeasurementDistances = measurementHasDistance
+      } catch (e) {
+        console.error(e)
+      }
     }
 
     private _updateHotspotInImage(hotspotPosition: Vector3) {
@@ -504,12 +535,12 @@ export class SceneHotspotElement extends EventEmitter {
 
 export class MeasurementPoint extends SceneHotspotElement {
 
-  constructor(index: number, position: Vector3, normal: Vector3, sceneOrientation: Euler) {
+  constructor(label: string | number, position: Vector3, normal: Vector3, sceneOrientation: Euler) {
     super(position, normal, sceneOrientation);
 
-    this._domElement.slot = 'hotspot-measurementpoint' + index;
+    this._domElement.slot = 'hotspot-measurementpoint' + label;
     this.domElement.classList.add('hotspot');
-    this.domElement.textContent = index.toString();
+    this.domElement.textContent = label.toString();
 
 
     this.domElement.addEventListener('click', (event: Event) => {
@@ -547,3 +578,4 @@ export class MeasurementDistanceAnnotation extends SceneHotspotElement {
     }
 }
 
+export type Measurement = { pos: number[], normal: number[], distance?: number, label: string }[]

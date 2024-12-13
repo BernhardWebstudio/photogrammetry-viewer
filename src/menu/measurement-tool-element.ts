@@ -41,9 +41,16 @@ export class MeasurementToolElement extends LitElement {
             <div class="alignCenter">
               <ui5-button
                 ?disabled="${this.measurementTool.numPoints === 0}"
-                @click="${() => { this.measurementTool.downloadPoints() }}"
+                @click="${() => { this.measurementTool.saveMeasurement('csv') }}"
                 title="Download as CSV"
-              >Download</ui5-button>
+              >Download CSV</ui5-button>
+            </div>
+            <div class="alignCenter">
+              <ui5-button
+                ?disabled="${this.measurementTool.numPoints === 0}"
+                @click="${() => { this.measurementTool.saveMeasurement('json') }}"
+                title="Download as JSON"
+              >Download JSON</ui5-button>
             </div>
           `}
         </div>
@@ -52,7 +59,7 @@ export class MeasurementToolElement extends LitElement {
         `}
         ${this.measurementTool.numPoints === 0 ? nothing : html`
           <div>
-            <ui5-checkbox text="Calculate distances" ?checked=${this.measurementTool.showMeasurementDistances} @change="${(ev: Event) => { this.measurementTool.showMeasurementDistances = (ev.target as HTMLInputElement).checked; this.requestUpdate()}}"></ui5-checkbox>
+            <ui5-checkbox text="Show distances" ?checked=${this.measurementTool.showMeasurementDistances} @change="${(ev: Event) => { this.measurementTool.showMeasurementDistances = (ev.target as HTMLInputElement).checked; this.requestUpdate()}}"></ui5-checkbox>
           </div>
           <table>
             <thead>
