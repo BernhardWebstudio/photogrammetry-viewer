@@ -8,18 +8,14 @@ export default defineConfig({
   build: {
     emptyOutDir: false,
     minify: "terser",
+    lib: {
+      entry: "src/index.ts",
+      fileName: "photogrammetry-viewer-without-modelviewer",
+      formats: ["es"],
+    },
     rollupOptions: {
-      input: "src/photogrammetry-viewer.ts",
-      output: {
-        dir: "dist",
-        entryFileNames: "photogrammetry-viewer-without-modelviewer.js",
-        format: "es"
-      },
       plugins: [terser({ format: { comments: false } })],
     },
   },
-  plugins: [
-    dts({ insertTypesEntry: true }),
-    peerDepsExternal()
-  ]
+  plugins: [dts({ insertTypesEntry: true }), peerDepsExternal()],
 });
