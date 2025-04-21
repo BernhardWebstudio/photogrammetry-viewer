@@ -1,11 +1,9 @@
-import { LitElement, css, html, svg } from "lit";
+import { LitElement, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 // import type {SegmentedButtonSelectionChangeEventDetail} from "@ui5/webcomponents";
 
-import { unsafeSVG } from "lit/directives/unsafe-svg.js";
 import { registerIcon } from "@ui5/webcomponents-base/dist/asset-registries/Icons.js";
-import { TemplateFunction } from "@ui5/webcomponents-base/dist/renderer/executeTemplate.js";
 import doubleviewIcon from "./assets/viewer_icon_doubleview.svg?raw";
 import doubleviewMobileIcon from "./assets/viewer_icon_doubleview_mobile.svg?raw";
 import doubleviewSyncedIcon from "./assets/viewer_icon_doubleview_synced.svg?raw";
