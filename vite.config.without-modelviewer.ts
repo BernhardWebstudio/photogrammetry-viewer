@@ -9,7 +9,7 @@ export default defineConfig({
     emptyOutDir: false,
     minify: "terser",
     lib: {
-      entry: "src/index.ts",
+      entry: "src/photogrammetry-viewer.ts",
       fileName: "photogrammetry-viewer-without-modelviewer",
       formats: ["es"],
     },
