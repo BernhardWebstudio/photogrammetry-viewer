@@ -127,7 +127,7 @@ export class ExportToolElement extends LitElement {
   async download3DFile() {
     this._saving3DFile = true;
     const fileToExport = this.viewerSettings.viewer3DElement?.src;
-
+    // could be wrong if the file is a glb instead of a gltf
     await this.downloadFile(fileToExport, "3d-model.gltf");
     this._saving3DFile = false;
   }
@@ -135,8 +135,8 @@ export class ExportToolElement extends LitElement {
   async download2DFile() {
     this._saving2DFile = true;
     const fileToExport = this.viewerSettings.viewer2DElement?.currentImageUrl;
-
-    await this.downloadFile(fileToExport, "3d-model.gltf");
+    // again, could be wrong choice of file type
+    await this.downloadFile(fileToExport, "2d-image.jpg");
     this._saving2DFile = false;
   }
 
@@ -173,36 +173,36 @@ export class ExportToolElement extends LitElement {
           ?hidden="!(${this._saving2D || this._saving3D})"
           delay="0"
         ></ui5-busy-indicator>
-      </div>
-      <div class="row">
-        <span>Export Files</span>
-      </div>
-      <div class="row">
-        <div class="alignCenter">
-          <ui5-button
-            @click="${() => {
-              this.download3DFile();
-            }}"
-            ?disabled="${this._saving3DFile}"
-            title="Save 3D view"
-            >3D</ui5-button
-          >
+        <div class="row">
+          <span style="margin-top: 1rem;">Export Files</span>
         </div>
-        <div class="alignCenter">
-          <ui5-button
-            @click="${() => {
-              this.download2DFile();
-            }}"
-            ?disabled="${this._saving2DFile}"
-            title="Save 2D view"
-            >2D</ui5-button
-          >
+        <div class="row">
+          <div class="alignCenter">
+            <ui5-button
+              @click="${() => {
+                this.download3DFile();
+              }}"
+              ?disabled="${this._saving3DFile}"
+              title="Save 3D view"
+              >3D</ui5-button
+            >
+          </div>
+          <div class="alignCenter">
+            <ui5-button
+              @click="${() => {
+                this.download2DFile();
+              }}"
+              ?disabled="${this._saving2DFile}"
+              title="Save 2D view"
+              >2D</ui5-button
+            >
+          </div>
+          <ui5-busy-indicator
+            ?active="${this._saving2DFile || this._saving3DFile}"
+            ?hidden="!(${this._saving2DFile || this._saving3DFile})"
+            delay="0"
+          ></ui5-busy-indicator>
         </div>
-        <ui5-busy-indicator
-          ?active="${this._saving2DFile || this._saving3DFile}"
-          ?hidden="!(${this._saving2DFile || this._saving3DFile})"
-          delay="0"
-        ></ui5-busy-indicator>
       </div>
     `;
   }
