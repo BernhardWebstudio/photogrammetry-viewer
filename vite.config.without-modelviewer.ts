@@ -14,6 +14,12 @@ export default defineConfig({
       formats: ["es"],
     },
     rollupOptions: {
+      input: "src/index.ts",
+      output: {
+        dir: "dist",
+        entryFileNames: "photogrammetry-viewer-without-modelviewer.js",
+        format: "es"
+      },
       plugins: [terser({ format: { comments: false } })],
     },
   },
