@@ -161,7 +161,7 @@ export class ControlPanel extends LitElement {
             .measurementTool="${this.viewerSettings.measurementTool}"
           ></measurement-tool>
         </pv-menu-item>
-        <pv-menu-item icon="camera" title="Save view as image" idx="4">
+        <pv-menu-item icon="camera" title="Save & Export" idx="4">
           <export-tool
             .viewerSettings="${this.viewerSettings}"
           ></export-tool>

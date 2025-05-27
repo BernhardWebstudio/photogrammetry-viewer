@@ -7,7 +7,7 @@ export default defineConfig({
   build: {
     minify: "terser",
     rollupOptions: {
-      input: "src/photogrammetry-viewer.ts",
+      input: "src/index.ts",
       output: {
         dir: "dist",
         entryFileNames: "photogrammetry-viewer.js",
