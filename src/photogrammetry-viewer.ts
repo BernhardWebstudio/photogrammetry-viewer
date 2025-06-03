@@ -143,6 +143,7 @@ export class PhotogrammetryViewer extends LitElement {
           min-field-of-view="0deg"
           max-field-of-view="18deg"
           interaction-prompt="none"
+          tone-mapping="neutral"
           skybox-image="${this.viewSettings.skyBoxImage}"
           .measurementTool="${this._viewerSettings.measurementTool}"
           @fov-based-zoom-changed="${this._handleFovBasedZoomChanged}"

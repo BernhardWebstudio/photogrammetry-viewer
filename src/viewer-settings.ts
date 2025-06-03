@@ -113,7 +113,7 @@ export class EnvironmentSettings extends EventEmitter {
     private _showAxes: boolean = false;
     private _remapAxes: Vector3 = new Vector3(0, 1, 2);
 
-    private _backgroundColor: string = '#444444'
+    private _backgroundColor: string = '#969696'
     private _gradientColor: string = '#b9b9b9'
     private _applyGradient: boolean = true;
 
