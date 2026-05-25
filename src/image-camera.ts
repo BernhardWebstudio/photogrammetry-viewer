@@ -1,12 +1,12 @@
-import {Vector3, Matrix4, Quaternion, Camera, Vector2, Euler} from 'three';
-import {ScanInformation} from './scan-information';
-import {Settings2DViewer, Settings3DViewer} from './sync-settings';
-import {SphericalPosition} from '@google/model-viewer/lib/features/controls';
-import {Sensor} from './sensor';
-import {toVector3D} from '@google/model-viewer/lib/model-viewer-base';
-import {EventEmitter} from 'events';
-import {EulerYXZ} from './eulerYXZ';
-import {normalizeDeg, radToDeg} from './angle-math-utils';
+import { Vector3, Matrix4, Quaternion, Camera, Vector2, Euler } from "three";
+import { ScanInformation } from "./scan-information";
+import { Settings2DViewer, Settings3DViewer } from "./sync-settings";
+import { SphericalPosition } from "@google/model-viewer/lib/features/controls";
+import { Sensor } from "./sensor";
+import { toVector3D } from "@google/model-viewer/lib/model-viewer-base";
+import { EventEmitter } from "events";
+import { EulerYXZ } from "./eulerYXZ";
+import { normalizeDeg, radToDeg } from "./angle-math-utils";
 
 export class ImageCamera extends EventEmitter {
   // extrinsic:
@@ -14,7 +14,6 @@ export class ImageCamera extends EventEmitter {
   normedPositions: Array<Vector3> = [];
 
   private _remapCoordinates: Vector3 = new Vector3(0, 1, 2);
-  private _isYupTransformApplied: boolean = true;
 
   private _sensorMap = new Map<string, Sensor>();
   private _sensorIds: Array<string> = [];
@@ -23,45 +22,31 @@ export class ImageCamera extends EventEmitter {
   private _chunkToWorldTransform: Matrix4 = new Matrix4();
   private _additionalRotation: Matrix4 = new Matrix4();
 
-  init(
-      scanInformation: ScanInformation,
-      isYupTransformApplied: boolean,
-      additionalRotation: Euler,
-  ) {
+  init(scanInformation: ScanInformation, additionalRotation: Euler) {
     this._sensorMap = scanInformation.sensorMap;
     this._sensorIds = scanInformation.sensorIds;
 
     this._camPosesInChunk = scanInformation.camPosesInChunk;
     this._chunkToWorldTransform = scanInformation.transformationChunkToWorld;
-    this._isYupTransformApplied = isYupTransformApplied;
-    this._additionalRotation = this._additionalRotation.makeRotationFromEuler(additionalRotation);
+    this._additionalRotation =
+      this._additionalRotation.makeRotationFromEuler(additionalRotation);
     this._calculateCamPosesInWorldCoor();
-  }
-
-  setIsYupTransformApplied(isYupTransformApplied: boolean): void {
-    if (isYupTransformApplied == this._isYupTransformApplied) {
-      return;
-    }
-
-    this._isYupTransformApplied = isYupTransformApplied;
-    this._calculateCamPosesInWorldCoor();
-    this.emit('camera-parameters-changed');
   }
 
   setAdditionalRotation(additionalRotation: EulerYXZ): void {
-    console.log('Set additional rotation');
+    console.log("Set additional rotation");
     this._additionalRotation = this._additionalRotation.makeRotationFromEuler(
-        additionalRotation.angleInRad,
+      additionalRotation.angleInRad,
     );
     this._calculateCamPosesInWorldCoor();
-    this.emit('camera-parameters-changed');
+    this.emit("camera-parameters-changed");
   }
 
   setAxesRemapping(newMapping: Vector3) {
-    console.log('Set new axes mapping');
+    console.log("Set new axes mapping");
     this._remapCoordinates = newMapping;
     this._calculateCamPosesInWorldCoor();
-    this.emit('camera-parameters-changed');
+    this.emit("camera-parameters-changed");
   }
 
   getImageSensor(imageIdx: number): Sensor | undefined {
@@ -77,19 +62,24 @@ export class ImageCamera extends EventEmitter {
     }
   }
 
-  getSyncSettingsOfNextBestImage(viewerCamera: Camera): [Settings2DViewer, Settings3DViewer] | [null, null] {
+  getSyncSettingsOfNextBestImage(
+    viewerCamera: Camera,
+  ): [Settings2DViewer, Settings3DViewer] | [null, null] {
     let normed3DCamPosition = viewerCamera.position.clone().normalize();
     normed3DCamPosition = new Vector3(
-        normed3DCamPosition.getComponent(this._remapCoordinates.getComponent(0)),
-        normed3DCamPosition.getComponent(this._remapCoordinates.getComponent(1)),
-        normed3DCamPosition.getComponent(this._remapCoordinates.getComponent(2)),
+      normed3DCamPosition.getComponent(this._remapCoordinates.getComponent(0)),
+      normed3DCamPosition.getComponent(this._remapCoordinates.getComponent(1)),
+      normed3DCamPosition.getComponent(this._remapCoordinates.getComponent(2)),
     );
 
     // get next best image idx
     let minAngle = Number.MAX_VALUE;
     let idxMinAngle = -1;
     for (let i = 0; i < this.normedPositions.length; i++) {
-      if (typeof this.normedPositions[i] === 'undefined' || this.normedPositions[i] === null) {
+      if (
+        typeof this.normedPositions[i] === "undefined" ||
+        this.normedPositions[i] === null
+      ) {
         continue;
       }
       const angle = Math.acos(normed3DCamPosition.dot(this.normedPositions[i])); // faster than .angleTo, as the vectors are already normalised
@@ -108,9 +98,9 @@ export class ImageCamera extends EventEmitter {
     const yDirImageCam = new Vector3();
     const zDirImageCam = new Vector3();
     this.poses[idxMinAngle].extractBasis(
-        xDirImageCam,
-        yDirImageCam,
-        zDirImageCam,
+      xDirImageCam,
+      yDirImageCam,
+      zDirImageCam,
     );
 
     // extract image pose of next best image
@@ -119,14 +109,14 @@ export class ImageCamera extends EventEmitter {
 
     // calculate ideal spherical x and y axis:
     const unrotatedImgCamAxisX = new Vector3(
-        Math.cos(thetaImageCam),
-        0,
-        -Math.sin(thetaImageCam),
+      Math.cos(thetaImageCam),
+      0,
+      -Math.sin(thetaImageCam),
     );
     const unrotatedImgCamAxisY = new Vector3(
-        -Math.cos(phiImageCam) * Math.sin(thetaImageCam),
-        Math.sin(phiImageCam),
-        -Math.cos(phiImageCam) * Math.cos(thetaImageCam),
+      -Math.cos(phiImageCam) * Math.sin(thetaImageCam),
+      Math.sin(phiImageCam),
+      -Math.cos(phiImageCam) * Math.cos(thetaImageCam),
     );
 
     // project x camera axis to ideal rotated x and y axis
@@ -137,11 +127,11 @@ export class ImageCamera extends EventEmitter {
 
     // calculate rotation angle:
     const rotAngle = normalizeDeg(
-        radToDeg(Math.atan2(projectedXDirCam2D.y, projectedXDirCam2D.x)),
+      radToDeg(Math.atan2(projectedXDirCam2D.y, projectedXDirCam2D.x)),
     );
 
     // output debug info
-    console.log('Computing sync settings of next best image', {
+    console.log("Computing sync settings of next best image", {
       rotAngle: rotAngle,
       idxMinAngle: idxMinAngle,
       minAngle: minAngle,
@@ -203,12 +193,10 @@ export class ImageCamera extends EventEmitter {
 
   private _calculateCamPosesInWorldCoor(): void {
     const transformationChunkToWorldYUp = this._chunkToWorldTransform.clone();
-    if (this._isYupTransformApplied) {
-      const transformationZupToYup = new Matrix4();
-      transformationZupToYup.makeRotationX(-Math.PI * 0.5);
+    const transformationZupToYup = new Matrix4();
+    transformationZupToYup.makeRotationX(-Math.PI * 0.5);
 
-      transformationChunkToWorldYUp.premultiply(transformationZupToYup);
-    }
+    transformationChunkToWorldYUp.premultiply(transformationZupToYup);
 
     const tmpPos = new Vector3();
     const tmpQuart = new Quaternion();
@@ -219,15 +207,15 @@ export class ImageCamera extends EventEmitter {
     for (let i = 0; i < this._camPosesInChunk.length; i++) {
       if (
         this._camPosesInChunk[i] == null ||
-        typeof this._camPosesInChunk[i] === 'undefined'
+        typeof this._camPosesInChunk[i] === "undefined"
       ) {
         continue;
       }
 
       const camPoseInWorldScaled = new Matrix4();
       camPoseInWorldScaled.multiplyMatrices(
-          transformationChunkToWorldYUp,
-          this._camPosesInChunk[i],
+        transformationChunkToWorldYUp,
+        this._camPosesInChunk[i],
       );
 
       camPoseInWorldScaled.premultiply(this._additionalRotation);
@@ -247,7 +235,7 @@ export class ImageCamera extends EventEmitter {
       this.normedPositions[i] = camPosition.normalize();
     }
 
-    console.log('Calculated camera poses in world coordinates', {
+    console.log("Calculated camera poses in world coordinates", {
       camPosesInChunk: this._camPosesInChunk,
       normedPoses: this.normedPositions,
       poses: this.poses,
